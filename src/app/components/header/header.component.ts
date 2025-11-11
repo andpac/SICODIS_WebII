@@ -104,13 +104,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
         label: 'PGN',
         items: [
           {
-            label: 'Regionalización',
+            label: 'Regionalización Programación',
             command: () => this.redirectUrl("pgn-regionalizacion")
           },
           {
+            label: 'Regionalización Seguimiento',
+            command: () => this.redirectUrl("pgn-seguimiento")
+          },
+          {
+            label: 'Inversión por sector, entidad y proyecto',
+            command: () => this.redirectUrl("pgn-inversion-por-sector")
+          },          
+          {
             label: 'Comparativa Regionalización',
             command: () => this.redirectUrl("pgn-comparativa-regionalizacion")
-          }
+          }          
         ]
       },   
       {

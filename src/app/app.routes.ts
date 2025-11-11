@@ -32,6 +32,7 @@ import { SgrProgramacionComponent } from './components/sgr-programacion/sgr-prog
 import { SgrRecaudoDirectasComponent } from './components/sgr-recaudo-directas/sgr-recaudo-directas.component';
 import { SgrMontosCorrientesConstantesComponent } from './components/sgr-montos-corrientes-constantes/sgr-montos-corrientes-constantes.component';
 import { PgnInversionPorSectorComponent } from './components/pgn-inversion-por-sector/pgn-inversion-por-sector.component';
+import { PgnRegionalizacionPresupuestoSeguimientoComponent } from './components/pgn-regionalizacion-presupuesto-seguimiento/pgn-regionalizacion-presupuesto-seguimiento.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -66,5 +67,6 @@ export const routes: Routes = [
     { path: 'sgr-montos-corrientes-constantes', component: SgrMontosCorrientesConstantesComponent },
     { path: 'pgn-inversion-por-sector', component:PgnInversionPorSectorComponent},
     { path: 'pgn-regionalizacion', component: PgnRegionalizacionPresupuestoProgramacionComponent },
+    { path: 'pgn-seguimiento', component: PgnRegionalizacionPresupuestoSeguimientoComponent },
     { path: 'pgn-comparativa-regionalizacion', component: PgnComparativaRegionalizacionComponent },    
 ];

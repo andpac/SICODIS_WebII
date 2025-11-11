@@ -172,6 +172,140 @@ export interface FichaComparativaEntidad {
   tipo: number;
 }
 
+// ========== PGN Request Parameters Interfaces ==========
+export interface VigenciaPgn {
+  id_vigencia: string;
+  vigencia: string;
+}
+
+export interface PeriodoPgn {
+  id_periodo: string;
+  periodo: string;
+}
+
+export interface RegionPgn {
+  codigo_region: string;
+  region: string;
+}
+
+export interface DepartamentoPgn {
+  codigo_dane_depto: string;
+  departamento: string;
+}
+
+
+export interface FuentePgn {
+  id_fuente: string;
+  fuente: string;
+}
+
+export interface SectorPgn {
+  id_sector: number;
+  sector: string;
+}
+
+
+export interface EntidadPgn {
+  codigo_entidad: string;
+  entidad: string;
+}
+
+export interface ProyectoPgn {
+  bpin: string;
+  proyecto: string;
+}
+
+
+
+export interface PgnResumenRegionalizacion {
+  vigencia: string;
+  periodo: string;
+  total_presupuesto_pgn_inversion: number;
+  total_regionalizado: number;
+  total_nacional: number;
+  total_por_regionalizar: number;
+  porcentaje_total_presupuesto_pgn_inversion: number;
+  porcentaje_regionalizado: number;
+  porcentaje_nacional: number;
+  porcentaje_por_regionalizar: number;
+
+}
+
+export interface PgnDetalleRegionalizacion {
+  vigencia: string;
+  periodo: string;
+  departamento: string;
+  total_presupuesto_pgn_inversion: number;
+  per_capita: number;
+}
+
+export interface PgnDatosRegionalizacionResponse {
+  resumen: PgnResumenRegionalizacion[];
+  detalle: PgnDetalleRegionalizacion[];
+}
+
+
+export interface PgnResumenInversion {
+  vigencia: string;
+  periodo: string;
+  total_apropiacion_vigente: number;
+  total_compromisos: number;
+  total_obligaciones: number;
+  total_pagos: number;
+  porcentaje_total_apropiacion_vigente: number;
+  porcentaje_total_compromisos: number;
+  porcentaje_total_obligaciones: number;
+  porcentaje_total_pagos: number;
+
+}
+
+export interface PgnDetalleInversion {
+  vigencia: string;
+  periodo: string;
+  total_apropiacion_vigente: string;
+  total_compromisos: number;
+  total_obligaciones: number;
+  total_pagos: number;
+}
+
+
+export interface PgnDatosInversionResponse {
+  resumen: PgnResumenInversion[];
+  detalle: PgnDetalleInversion[];
+}
+
+
+
+export interface PgnResumenSeguimiento {
+  vigencia: string;
+  periodo: string;
+  total_apropiacion_vigente: number;
+  total_compromisos: number;
+  total_obligaciones: number;
+  total_pagos: number;
+  porcentaje_total_apropiacion_vigente: number;
+  porcentaje_total_compromisos: number;
+  porcentaje_total_obligaciones: number;
+  porcentaje_total_pagos: number;
+
+}
+
+export interface PgnDetalleSeguimiento {
+  vigencia: string;
+  periodo: string;
+  total_apropiacion_vigente: string;
+  total_compromisos: number;
+  total_obligaciones: number;
+  total_pagos: number;
+}
+
+
+export interface PgnDatosSeguimientoResponse {
+  resumen: PgnResumenSeguimiento[];
+  detalle: PgnDetalleSeguimiento[];
+}
+
+
 // ========== Request Parameters Interfaces ==========
 export interface DistribucionTotalParams {
   idVigencia?: number;
@@ -473,4 +607,234 @@ export class SicodisApiService {
     const url = `${this.baseUrl}/sgp/ficha_comparativa_entidad/${idVigencia}/${codigoEntidad1}/${codigoEntidad2}`;
     return this.http.get<FichaComparativaEntidad[]>(url);
   }
+
+// ========== PGN Methods ==========  
+
+  /**
+   * Obtiene las vigencias de presupuesto para PGN
+   * @returns Observable con el array de vigencias de presupuesto
+   */
+  getPgnVigencias(): Observable<VigenciaPgn[]> {
+    const url = `${this.baseUrl}/pgn/vigencias`;
+    return this.http.get<VigenciaPgn[]>(url);
+  }
+
+  /**
+   * Obtiene el periodo de PGN para un año específico
+   * @param id_vigencia - Año de consulta
+   * @returns Observable con los periodos del año
+   */
+  getPgnPeriodoPorVigencia(id_vigencia : string): Observable<PeriodoPgn[]> {
+    const url = `${this.baseUrl}/pgn/periodos_por_vigencia/${id_vigencia}`;
+    return this.http.get<PeriodoPgn[]>(url);
+  }
+
+  /**
+   * Obtiene los departamentos para regionalización de acuerdo con la vigencia y periodo para asegurar que hay resultados
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @returns Observable con los periodos para la vigencia y periodo seleccionados
+   */
+  getPgnDepartamentosPorVigenciaPeriodo(id_vigencia : string, id_periodo  : string): Observable<DepartamentoPgn[]> {
+    const url = `${this.baseUrl}/pgn/departamentos_por_vigencia_periodo/${id_vigencia}/${id_periodo}`;
+    return this.http.get<DepartamentoPgn[]>(url);
+  }  
+
+  /**
+   * Obtiene los departamentos para regionalización de acuerdo con la vigencia y periodo para asegurar que hay resultados
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param codigo_region - Región de consulta
+   * @returns Observable con los periodos para la vigencia y periodo seleccionados
+   */
+  getPgnDepartamentosPorVigenciaPeriodoRegion(id_vigencia : string, id_periodo  : string, codigo_region :  string): Observable<DepartamentoPgn[]> {
+    const url = `${this.baseUrl}/pgn/departamentos_por_vigencia_periodo_region/${id_vigencia}/${id_periodo}/${codigo_region}`;
+    return this.http.get<DepartamentoPgn[]>(url);
+  }  
+
+
+  /**
+   * Obtiene las fuentes para regionalización de acuerdo con la vigencia y periodo para asegurar que hay resultados
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados
+   */
+  getPgnFuentesPorVigenciaPeriodo(id_vigencia : string, id_periodo  : string): Observable<FuentePgn[]> {
+    const url = `${this.baseUrl}/pgn/fuentes_por_vigencia_periodo/${id_vigencia}/${id_periodo}`;
+    return this.http.get<FuentePgn[]>(url);
+  }    
+
+
+   /**
+   * Obtiene los datos de resumen y detalle de regionaización dados unos parámetros
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param codigo_dane_depto - Código del departamento
+   * @param id_fuente - Código de la fuente
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados, así como el departamento y la fuente.
+   */
+  getPgnDatosRegionalizacionPorVigenciaPeriodo(id_vigencia : string
+                                              , id_periodo  : string
+                                              , codigo_dane_depto  : string
+                                              , id_fuente  : string): Observable<PgnDatosRegionalizacionResponse> {
+    const url = `${this.baseUrl}/pgn/datosregionalizacion_por_vigencia_periodo/${id_vigencia}/${id_periodo}/${codigo_dane_depto}/${id_fuente}`;
+    return this.http.get<PgnDatosRegionalizacionResponse>(url);
+  } 
+
+
+  
+
+   /**
+   * Obtiene los datos de resumen y detalle de regionaización dados unos parámetros
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param codigo_dane_depto - Código del departamento
+   * @param id_fuente - Código de la fuente
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados, así como el departamento y la fuente.
+   */
+  getPgnDescargaDatosRegionalizacionPorVigenciaPeriodo( id_vigencia: string,
+                                                        id_periodo: string,
+                                                        codigo_dane_depto: string,
+                                                        id_fuente: string
+                                                      ): Observable<Blob> {  
+    const url = `${this.baseUrl}/pgn/descargadatosregionalizacion_por_vigencia_periodo/${id_vigencia}/${id_periodo}/${codigo_dane_depto}/${id_fuente}`;
+    return this.http.get(url, { responseType: 'blob' });  // responseType 'blob' indica que será un archivo binario
+  }
+
+
+
+  /**
+   * Obtiene los sectores reporte de PGN por sectores de acuerdo con la vigencia y periodo para asegurar que hay resultados
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados
+   */
+  getPgnSectoresPorVigenciaPeriodo(id_vigencia : string, id_periodo  : string): Observable<SectorPgn[]> {
+    const url = `${this.baseUrl}/pgn/sectores_por_vigencia_periodo/${id_vigencia}/${id_periodo}`;
+    return this.http.get<SectorPgn[]>(url);
+  }   
+
+
+
+  /**
+   * Obtiene las entidades para los sectores para el reporte de PGN 
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param id_sector  - Id sector
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados
+   */
+  getPgnEntidadesPorVigenciaPeriodoSector(id_vigencia : string, id_periodo  : string, id_sector :  number): Observable<EntidadPgn[]> {
+    const url = `${this.baseUrl}/pgn/entidades_por_vigencia_periodo_sector/${id_vigencia}/${id_periodo}/${id_sector}`;
+    return this.http.get<EntidadPgn[]>(url);
+  }  
+
+  /**
+   * Obtiene las entidades para los sectores para el reporte de PGN 
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param id_sector  - Id sector
+   * @param codigo_entidad  - Código de la entidad
+   * @returns Observable con las fuentes para la vigencia y periodo seleccionados
+   */
+  getPgnProyectosEntidadPorVigenciaPeriodoSector(id_vigencia : string
+                                                , id_periodo  : string
+                                                , id_sector :  number
+                                                , codigo_entidad : string ): Observable<ProyectoPgn[]> {
+    const url = `${this.baseUrl}/pgn/proyectos_entidad_por_vigencia_periodo_sector/${id_vigencia}/${id_periodo}/${id_sector}/${codigo_entidad}`;
+    return this.http.get<ProyectoPgn[]>(url);
+  } 
+
+  /**
+   * Obtiene las entidades para los sectores para el reporte de PGN 
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param id_sector  - Id sector
+   * @param codigo_entidad  - Código de la entidad
+   * @param bpin  - Bpin del proyecto
+   * @param id_fuente - Código de la fuente* 
+   * @returns Observable con los datos de inversión
+   */
+  getPgnDatosInversionFuenteProyectosEntidadPorVigenciaPeriodoSector(id_vigencia : string
+                                                                    , id_periodo  : string
+                                                                    , id_sector :  number
+                                                                    , codigo_entidad : string 
+                                                                    , bpin : string 
+                                                                    , id_fuente : string ): Observable<PgnDatosInversionResponse> {
+    const url = `${this.baseUrl}/pgn/datosinversion_fuente_proyectos_entidad_por_vigencia_periodo_sector/${id_vigencia}/${id_periodo}/${id_sector}/${codigo_entidad}/${bpin}/${id_fuente}`;
+    return this.http.get<PgnDatosInversionResponse>(url);
+  } 
+
+
+  /**
+   * Obtiene las entidades para los sectores para el reporte de PGN 
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param id_sector  - Id sector
+   * @param codigo_entidad  - Código de la entidad
+   * @param bpin  - Bpin del proyecto
+   * @param id_fuente - Código de la fuente* 
+   * @returns Observable con los datos de inversión
+   */
+  getPgnDescargaDatosInversionFuenteProyectosEntidadPorVigenciaPeriodoSector(id_vigencia : string
+                                                                            , id_periodo  : string
+                                                                            , id_sector :  number
+                                                                            , codigo_entidad : string 
+                                                                            , bpin : string 
+                                                                            , id_fuente : string ): Observable<Blob> {
+    const url = `${this.baseUrl}/pgn/descargadatosinversion_fuente_proyectos_entidad_por_vigencia_periodo_sector/${id_vigencia}/${id_periodo}/${id_sector}/${codigo_entidad}/${bpin}/${id_fuente}`;
+    return this.http.get(url, { responseType: 'blob' });  // responseType 'blob' indica que será un archivo binario
+  } 
+
+
+  /**
+   * Obtiene las regiones  para PGN seguimiento de acuerdo con la vigencia y periodo para asegurar que hay resultados
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @returns Observable con las regiones para la vigencia y periodo seleccionados
+   */
+  getPgnRegionesPorVigenciaPeriodo(id_vigencia : string, id_periodo  : string): Observable<RegionPgn[]> {
+    const url = `${this.baseUrl}/pgn/regiones_por_vigencia_periodo/${id_vigencia}/${id_periodo}`;
+    return this.http.get<RegionPgn[]>(url);
+  }  
+
+
+
+   /**
+   * Obtiene los datos de resumen y detalle de regionaización dados unos parámetros
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param codigo_region - Código de la región
+   * @param codigo_dane_depto - Código del departamento
+   * @param id_fuente - Código de la fuente
+   * @returns Observable con las datos  para la vigencia y periodo, región seleccionados, así como el departamento y la fuente.
+   */
+  getPgnDatosSeguimientoPorVigenciaPeriodo(id_vigencia : string
+                                              , id_periodo  : string
+                                              , codigo_region :  string
+                                              , codigo_dane_depto  : string
+                                              , id_fuente  : string): Observable<PgnDatosRegionalizacionResponse> {
+    const url = `${this.baseUrl}/pgn/datosseguimiento_por_vigencia_periodo_region_depto_fuente/${id_vigencia}/${id_periodo}/${codigo_region}/${codigo_dane_depto}/${id_fuente}`;
+    return this.http.get<PgnDatosRegionalizacionResponse>(url);
+  }   
+
+
+
+   /**
+   * Obtiene los datos de resumen y detalle de regionaización dados unos parámetros
+   * @param id_vigencia - Año de consulta
+   * @param id_periodo - Periodo de consulta
+   * @param codigo_region - Código de la región
+   * @param codigo_dane_depto - Código del departamento
+   * @param id_fuente - Código de la fuente
+   * @returns Observable con las datos  para la vigencia y periodo, región seleccionados, así como el departamento y la fuente.
+   */
+  getPgnDescargaDatoSeguimientoPorVigenciaPeriodoRegionDeptoFuente(id_vigencia : string
+                                                                  , id_periodo  : string
+                                                                  , codigo_region :  string
+                                                                  , codigo_dane_depto  : string
+                                                                  , id_fuente  : string): Observable<Blob> {
+    const url = `${this.baseUrl}/pgn/descargadatosseguimiento_por_vigencia_periodo_region_depto_fuente/${id_vigencia}/${id_periodo}/${codigo_region}/${codigo_dane_depto}/${id_fuente}`;
+    return this.http.get(url, { responseType: 'blob' });  // responseType 'blob' indica que será un archivo binario
+  }   
+
 }

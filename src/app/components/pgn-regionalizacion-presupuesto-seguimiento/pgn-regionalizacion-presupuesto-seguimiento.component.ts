@@ -17,7 +17,7 @@ import { Breadcrumb } from 'primeng/breadcrumb';
 import { MenuItem } from 'primeng/api';
 
 @Component({
-  selector: 'app-pgn-regionalizacion-presupuesto-programacion',
+  selector: 'app-pgn-regionalizacion-presupuesto-seguimiento',
   standalone: true,
   imports: [
     CommonModule,
@@ -31,10 +31,10 @@ import { MenuItem } from 'primeng/api';
     TableModule,
     Breadcrumb
   ],
-  templateUrl: './pgn-regionalizacion-presupuesto-programacion.component.html',
-  styleUrl: './pgn-regionalizacion-presupuesto-programacion.component.scss'
+  templateUrl: './pgn-regionalizacion-presupuesto-seguimiento.component.html',
+  styleUrl: './pgn-regionalizacion-presupuesto-seguimiento.component.scss'
 })
-export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnInit {
+export class PgnRegionalizacionPresupuestoSeguimientoComponent implements OnInit {
 
   items: MenuItem[] | undefined;
   home: MenuItem | undefined;
@@ -42,6 +42,7 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
   // Filter properties
   selectedVigencia: any;
   selectedPeriodo: any;
+  selectedRegion: any;
   selectedDepartamento: any;
   selectedFuente: any;
 
@@ -51,6 +52,7 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
   // Data arrays
   vigencias: any[] = [];
   periodos: any[] = [];
+  regiones: any[] = [];
   departamentos: any[] = [];
   fuentes: any[] = [];
   // Arreglos para el resultado
@@ -77,7 +79,7 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
     private sicodisApiService: SicodisApiService
   ) {}
 
-  get resumenDataRegionalizacion() : any {
+  get resumenDataRegionalizacionSeguimiento() : any {
     return this.resumen.length > 0 ? this.resumen[0] : null;
   }
 
@@ -85,7 +87,7 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
   async ngOnInit(): Promise<void> {
     this.items = [
         { label: 'PGN', routerLink: '/pgn-inicio' },
-        { label: 'Regionalización Presupuesto Programación' }
+        { label: 'Regionalización Presupuesto Seguimiento' }
     ];
 
     this.home = { icon: 'pi pi-home', routerLink: '/' };
@@ -93,53 +95,11 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
       // Cargar datos necesarios desde API para los filtros del formularios
     await this.cargarVigencias();
     await this.cargarPeriodos();
+    await this.cargarRegiones();
     await this.cargarDepartamentos();
     await this.cargarFuentes();
-    await this.cargarDatosRegionalizados();
+    await this.cargarDatosSeguimiento();
 
-
-    //this.initializeFilters();
-    //this.initializeDepartamentosData();
-  }
-
-  private initializeFilters(): void {
-    // Initialize years from 2025 to 2002
-    this.vigencias = [];
-    for (let year = 2025; year >= 2002; year--) {
-      this.vigencias.push({
-        label: year.toString(),
-        value: year.toString()
-      });
-    }
-
-    // Initialize periods from 01 to 12
-    this.periodos = [];
-    for (let month = 1; month <= 12; month++) {
-      const monthStr = month.toString().padStart(2, '0');
-      this.periodos.push({
-        label: monthStr,
-        value: monthStr
-      });
-    }
-
-    //Initialize departments
-    this.departamentos = departamentos.map(dept => ({
-      label: dept.nombre,
-      value: dept.codigo
-    }));
-
-    //Initialize sources (example data)
-    this.fuentes = [
-      { label: 'Sistema General de Participaciones', value: 'SGP' },
-      { label: 'Sistema General de Regalías', value: 'SGR' },
-      { label: 'Recursos Propios', value: 'RP' },
-      { label: 'Transferencias Nacionales', value: 'TN' },
-      { label: 'Otras Fuentes', value: 'OF' }
-    ];
-
-    // Set default values
-    this.selectedVigencia = this.vigencias[0];
-    this.selectedPeriodo = this.periodos[0];
   }
 
 
@@ -193,7 +153,39 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
   }
 
 
+  /**
+   * Cargar datos de las regiones desde la API para inicializar el formulario
+   */
+  private async cargarRegiones(): Promise<void> {
+    try {
+      console.log('Vigencia seleccionada por defecto:', this.selectedVigencia);
+      console.log('Periodo seleccionado por defecto:', this.selectedPeriodo);
+
+      const regiones = await this.sicodisApiService.getPgnRegionesPorVigenciaPeriodo(this.selectedVigencia.id, this.selectedPeriodo.id).toPromise();
+
+      // Mapeamos los resultados
+      this.regiones = regiones?.map((region: any) => ({
+        id: region.codigo_region,
+        label: region.region
+      })) || [];
+
+      // Se agrega la opción "0 - Todos" al inicio
+      this.regiones.unshift({ id: '0', label: 'Todas' });
+
+      // Seleccionamos "Todas" por defecto
+      this.selectedRegion = this.regiones[0];
+
+      console.log('Regiones cargados desde API:', this.regiones);
+      console.log('Regiones seleccionado por defecto:', this.selectedRegion);
+
+    } catch (error) {
+      console.warn('Error cargando regiones desde API, se usarán datos locales como fallback:', error);
+      this.regiones = [{ id: '0', label: 'Todos' }];
+      this.selectedRegion = this.regiones[0];
+    }
+  }
   
+
 
   /**
    * Cargar datos de los departamentos desde la API para inicializar el formulario
@@ -202,8 +194,9 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
     try {
       console.log('Vigencia seleccionada por defecto:', this.selectedVigencia);
       console.log('Periodo seleccionado por defecto:', this.selectedPeriodo);
+      console.log('Región seleccionada por defecto:', this.selectedRegion);
 
-      const departamentos = await this.sicodisApiService.getPgnDepartamentosPorVigenciaPeriodo(this.selectedVigencia.id, this.selectedPeriodo.id).toPromise();
+      const departamentos = await this.sicodisApiService.getPgnDepartamentosPorVigenciaPeriodoRegion(this.selectedVigencia.id, this.selectedPeriodo.id, this.selectedRegion.id).toPromise();
 
       // Mapeamos los resultados
       this.departamentos = departamentos?.map((departamento: any) => ({
@@ -266,16 +259,25 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
   /**
    * Cargar datos de resumen y detalle de los departamentos de regionalización PGN a partir de los filtros seleccionados
    */
-  private async cargarDatosRegionalizados(): Promise<void> {
+  private async cargarDatosSeguimiento(): Promise<void> {
     try {
       console.log('Vigencia seleccionada por defecto:', this.selectedVigencia);
       console.log('Periodo seleccionado por defecto:', this.selectedPeriodo);
+      console.log('Region seleccionado por defecto:', this.selectedRegion);
       console.log('Código Departamento  seleccionado por defecto:', this.selectedDepartamento);
       console.log('Fuente seleccionada por defecto:', this.selectedFuente);
 
 
-    const response = await this.sicodisApiService.getPgnDatosRegionalizacionPorVigenciaPeriodo( this.selectedVigencia.id,
+    // const response = await this.sicodisApiService.getPgnDatosRegionalizacionPorVigenciaPeriodo( this.selectedVigencia.id,
+    //                                                                                             this.selectedPeriodo.id,
+    //                                                                                             this.selectedDepartamento.id,
+    //                                                                                             this.selectedFuente.id
+    //                                                                                           )
+    //                                                                                           .toPromise();
+
+    const response = await this.sicodisApiService.getPgnDatosSeguimientoPorVigenciaPeriodo( this.selectedVigencia.id,
                                                                                                 this.selectedPeriodo.id,
+                                                                                                this.selectedRegion.id,
                                                                                                 this.selectedDepartamento.id,
                                                                                                 this.selectedFuente.id
                                                                                               )
@@ -288,6 +290,64 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
 
     console.log('Resumen recibido:', this.resumen);
     console.log('Detalle recibido:', this.detalle);
+
+
+    } catch (error) {
+      console.warn('Error cargando fuentes desde API, se usarán datos locales como fallback:', error);
+    }
+  }
+
+
+  /**
+   * Cargar datos de resumen y detalle de los departamentos de regionalización PGN a partir de los filtros seleccionados
+   */
+  private async descargarDatosSeguimiento(): Promise<void> {
+    try {
+      console.log('Vigencia seleccionada por defecto:', this.selectedVigencia);
+      console.log('Periodo seleccionado por defecto:', this.selectedPeriodo);
+      console.log('Region seleccionado por defecto:', this.selectedRegion);
+      console.log('Código Departamento  seleccionado por defecto:', this.selectedDepartamento);
+      console.log('Fuente seleccionada por defecto:', this.selectedFuente);
+
+
+
+    const archivo: Blob | undefined = await this.sicodisApiService
+                                            .getPgnDescargaDatoSeguimientoPorVigenciaPeriodoRegionDeptoFuente( this.selectedVigencia.id,
+                                                                                                              this.selectedPeriodo.id,
+                                                                                                              this.selectedRegion.id,
+                                                                                                              this.selectedDepartamento.id,
+                                                                                                              this.selectedFuente.id
+                                                                                                              )
+                                                                                                              .toPromise();
+
+      // Verificamos que sí tengamos archivo
+      if (!archivo) {
+        console.warn('No se recibió ningún archivo desde el servicio');
+        return;
+      }
+
+
+      // Forzar tipo MIME correcto para Excel
+      const excelBlob = new Blob([archivo], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+
+      const arrayBuffer = await excelBlob.arrayBuffer();
+      console.log('Tamaño de archivo:', arrayBuffer.byteLength);
+
+      // Crear enlace temporal para descargar
+      const url = window.URL.createObjectURL(excelBlob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      const nombreArchivo = `seguimiento_${this.selectedVigencia.id}_${this.selectedPeriodo.id}.xlsx`;
+      a.download = nombreArchivo;
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+
+      console.log('Archivo descargado exitosamente');
+
 
 
     } catch (error) {
@@ -364,6 +424,13 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
     this.cargarFuentes();    
   }
 
+  onRegionChange(event: SelectChangeEvent): void {
+    console.log('Región seleccionada:', event.value);
+    this.selectedRegion = event.value;
+    this.cargarDepartamentos();
+    this.cargarFuentes();    
+  }
+
   onDepartamentoChange(event: SelectChangeEvent): void {
     console.log('Departamento seleccionado:', event.value);
     this.selectedDepartamento = event.value;   
@@ -380,7 +447,7 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
     console.log('Periodo:', this.selectedPeriodo);
     console.log('Departamento:', this.selectedDepartamento);
     console.log('Fuente:', this.selectedFuente);
-    this.cargarDatosRegionalizados();
+    this.cargarDatosSeguimiento();
 
     this.isLoading = true;
 
@@ -436,6 +503,25 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
     ];
   }
 
+
+  getTotalApropiacionVigente(): number {
+    return this.detalle.reduce((sum, item) => sum + item.total_apropiacion_vigente, 0);
+  }
+
+
+  getTotalCompromisos(): number {
+    return this.detalle.reduce((sum, item) => sum + item.total_compromisos, 0);
+  }
+
+
+  getTotalObligaciones(): number {
+    return this.detalle.reduce((sum, item) => sum + item.total_obligaciones, 0);
+  }
+
+  getTotalPagos(): number {
+    return this.detalle.reduce((sum, item) => sum + item.total_pagos, 0);
+  }
+
   getTotalVigencia(): number {
     return this.detalle.reduce((sum, item) => sum + item.total_presupuesto_pgn_inversion, 0);
   }
@@ -458,11 +544,11 @@ export class PgnRegionalizacionPresupuestoProgramacionComponent implements OnIni
 
   exportToExcel(): void {
     console.log('Exportando a Excel...');
-        console.log('Actualizando datos...');
+    console.log('Actualizando datos...');
     console.log('Vigencia:', this.selectedVigencia);
     console.log('Periodo:', this.selectedPeriodo);
     console.log('Departamento:', this.selectedDepartamento);
     console.log('Fuente:', this.selectedFuente);
-    this.descargarDatosRegionalizados();
+    this.descargarDatosSeguimiento();
   }
 }

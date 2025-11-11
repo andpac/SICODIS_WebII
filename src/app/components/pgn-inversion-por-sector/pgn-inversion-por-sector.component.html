@@ -1,91 +1,162 @@
-<div class="png-inversion-container">
+<div class="pgn-inversion-container">
 
-    <!-- Banner -->
+  <!-- Breadcrumb -->
+  <div class="card flex justify-center">
+    <p-breadcrumb [model]="items" [home]="home" />
+  </div>
+
   <div class="gradient-banner">    
     <div class="gradient-overlay"></div>
     <div class="banner-content">
       <h1>Inversión por programa, proyecto, fuente</h1>
-      <p>Este módulo presenta el reporte de inversión por programa, proyecto y fuente</p>
+      <p>Este módulo presenta el reporte de inversión por sector, entidad, proyecto y fuente</p>
     </div>
   </div>
 
-  <!-- Panel superior con filtros -->
-  <div class="filters-panel">
-    <div class="filters-row">
-      <div class="p-field vigencia-select">
-        <p-floatlabel class="w-full md:w-56" variant="on">
-          <p-select 
-            id="vigencia" 
-            [options]="vigencias" 
-            inputId="vigenciaSelect" 
-            [(ngModel)]="selectedVigencia"
-            (onChange)="onVigenciaChange($event)"
-            optionLabel="vigencia" 
-            optionValue="id_vigencia"
-            placeholder="Vigencia">
-          </p-select>
-          <label for="vigenciaSelect">Vigencia</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="p-field periodo-select">
-        <p-floatlabel class="w-full md:w-56" variant="on">
-          <p-select 
-            id="periodo" 
-            [options]="periodos" 
-            inputId="periodoSelect" 
-            [(ngModel)]="selectedPeriodo"
-            (onChange)="onPeriodoChange($event)"
-            optionLabel="label" 
-            placeholder="Periodo">
-          </p-select>
-          <label for="periodoSelect">Periodo</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="p-field departamento-select">
-        <p-floatlabel class="w-full md:w-56" variant="on">
-          <p-select 
-            id="departamento" 
-            [options]="departamentosData" 
-            inputId="departamentoSelect"
-            [(ngModel)]="selectedDepartamento" 
-            (onChange)="onDepartamentoChange($event)"
-            optionLabel="departamento" 
-            placeholder="Departamento">
-          </p-select>
-          <label for="departamentoSelect">Departamento</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="p-field fuente-select">
-        <p-floatlabel class="w-full md:w-56" variant="on">
-          <p-select 
-            id="fuente" 
-            [options]="fuentes" 
-            inputId="fuenteSelect"
-            [(ngModel)]="selectedFuente" 
-            (onChange)="onFuenteChange($event)"
-            optionLabel="label" 
-            placeholder="Fuente">
-          </p-select>
-          <label for="fuenteSelect">Fuente</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="p-field action-buttons">
-        <button pButton type="button" icon="pi pi-refresh" label="Actualizar" 
-          class="p-button-primary" (click)="onActualizar()" [disabled]="isLoading">
-        </button>
-        <button pButton type="button" icon="pi pi-eraser" label="Limpiar filtros" 
-          class="p-button-secondary" (click)="clearFilters()">
-        </button>
-      </div>
+<!-- Panel superior con filtros -->
+<div class="filters-panel">
+  <div class="filters-row">
+    <!-- Vigencia -->
+    <div class="p-field vigencia-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="vigencia" 
+          [options]="vigencias" 
+          inputId="vigenciaSelect" 
+          [(ngModel)]="selectedVigencia"
+          (onChange)="onVigenciaChange($event)"
+          optionLabel="label" 
+          placeholder="Vigencia">
+        </p-select>
+        <label for="vigenciaSelect">Vigencia</label>
+      </p-floatlabel>
     </div>
+
+    <!-- Periodo -->
+    <div class="p-field periodo-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="periodo" 
+          [options]="periodos" 
+          inputId="periodoSelect" 
+          [(ngModel)]="selectedPeriodo"
+          (onChange)="onPeriodoChange($event)"
+          optionLabel="label" 
+          placeholder="Periodo">
+        </p-select>
+        <label for="periodoSelect">Periodo</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Sector (más ancho) -->
+    <div class="p-field sector-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="sector" 
+          [options]="sectores" 
+          inputId="sectorSelect"
+          [(ngModel)]="selectedSector" 
+          (onChange)="onSectorChange($event)"
+          optionLabel="label" 
+          placeholder="Sector">
+        </p-select>
+        <label for="sectorSelect">Sector</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Entidad -->
+    <div class="p-field entidad-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="entidad" 
+          [options]="entidades" 
+          inputId="entidadSelect"
+          [(ngModel)]="selectedEntidad" 
+          (onChange)="onEntidadChange($event)"
+          optionLabel="label" 
+          placeholder="Entidad">
+        </p-select>
+        <label for="entidadSelect">Entidad</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Proyecto -->
+    <div class="p-field proyecto-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="proyecto" 
+          [options]="proyectos" 
+          inputId="proyectoSelect"
+          [(ngModel)]="selectedProyecto" 
+          (onChange)="onProyectoChange($event)"
+          optionLabel="label" 
+          placeholder="Proyecto">
+        </p-select>
+        <label for="proyectoSelect">Proyecto</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Fuente -->
+    <div class="p-field fuente-select">
+      <p-floatlabel class="w-full" variant="on">
+        <p-select 
+          id="fuente" 
+          [options]="fuentes" 
+          inputId="fuenteSelect"
+          [(ngModel)]="selectedFuente" 
+          (onChange)="onFuenteChange($event)"
+          optionLabel="label" 
+          placeholder="Fuente">
+        </p-select>
+        <label for="fuenteSelect">Fuente</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Botones -->
+    <div class="p-field action-buttons">
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-refresh" 
+        label="Actualizar" 
+        class="p-button-primary"
+        (click)="onActualizar()" 
+        [disabled]="isLoading">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-eraser" 
+        label="Limpiar filtros" 
+        class="p-button-secondary" 
+        (click)="clearFilters()">
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- Mensaje cuando no hay datos seleccionados -->
+  <div *ngIf="!selectedVigencia || !selectedPeriodo" class="no-data-message">
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="no-data-content">
+          <mat-icon class="no-data-icon">info</mat-icon>
+          <h3>Seleccione los filtros para ver la información</h3>
+          <p>Para visualizar los datos de regionalización del presupuesto, complete la selección de 
+            Vigencia y Periodo en el panel superior.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <p-progressSpinner strokeWidth="3" fill="transparent" animationDuration=".5s"></p-progressSpinner>
+    <p>Cargando datos...</p>
   </div>
 
   <!-- Content area -->
-  <div class="content-area">
+  <div class="content-area" *ngIf="selectedVigencia && selectedPeriodo && !isLoading">
     <div class="data-sections">
       <!-- Left section - Summary -->
       <div class="left-section">
@@ -97,7 +168,7 @@
             <!-- Single column items -->
             <div class="summary-item">
               <div class="summary-title">Vigencia</div>
-              <div class="summary-value">{{selectedVigencia?.vigencia}}</div>
+              <div class="summary-value">{{selectedVigencia?.label}}</div>
             </div>
             
             <div class="summary-item">
@@ -107,34 +178,35 @@
 
             <!-- Two column items -->
             <div class="summary-item two-column">
-              <div class="summary-title">Total Presupuesto PGN - Inversión</div>
+              <div class="summary-title">Apropiación vigente</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenData.totalPresupuesto)}}</div>
-                <div class="summary-percentage">{{resumenData.totalPorcentaje}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataInversion.total_apropiacion_vigente )}}</div>
+                
+                <div class="summary-percentage">{{resumenDataInversion.porcentaje_total_apropiacion_vigente}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Regionalizado</div>
+              <div class="summary-title">Compromisos</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenData.regionalizado)}}</div>
-                <div class="summary-percentage">{{resumenData.regionalizadoPorcentaje}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataInversion.total_compromisos)}}</div>
+                <div class="summary-percentage">{{resumenDataInversion.porcentaje_total_compromisos}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Nacional</div>
+              <div class="summary-title">Obligaciones</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenData.nacional)}}</div>
-                <div class="summary-percentage">{{resumenData.nacionalPorcentaje}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataInversion.total_obligaciones)}}</div>
+                <div class="summary-percentage">{{resumenDataInversion.porcentaje_total_obligaciones}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Por Regionalizar</div>
+              <div class="summary-title">Pagos</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenData.porRegionalizar)}}</div>
-                <div class="summary-percentage">{{resumenData.porRegionalizarPorcentaje}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataInversion.total_pagos)}}</div>
+                <div class="summary-percentage">{{resumenDataInversion.porcentaje_total_pagos}}%</div>
               </div>
             </div>
           </mat-card-content>
@@ -148,7 +220,7 @@
             <mat-card-title class="card-title">Distribución por Departamento</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <p-table [value]="departamentosData" [scrollable]="true" scrollHeight="615px">
+            <p-table [value]="detalle" [scrollable]="true" scrollHeight="615px">
               <ng-template pTemplate="header">
                 <tr>
                   <th>Departamento</th>
@@ -181,6 +253,16 @@
         </mat-card>
       </div>
     </div>
+  </div>
+
+  <div class="final-notes-container">
+    <p class="final-note" style="font-size: 0.65rem;">
+      <strong>Nota:</strong> Corresponde a cifras en pesos corrientes.
+    </p>
+    <p class="final-note" style="padding-bottom: 1em; font-size: 0.65rem;">
+      <strong>Fuente:</strong> DNP - DPIP - SDRT a partir del Presupuesto General de la Nación y reportes 
+      de regionalización presupuestal.
+    </p>
   </div>
 
 </div>

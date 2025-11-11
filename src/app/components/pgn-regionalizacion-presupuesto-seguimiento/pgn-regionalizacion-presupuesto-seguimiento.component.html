@@ -8,9 +8,9 @@
   <div class="gradient-banner">    
     <div class="gradient-overlay"></div>
     <div class="banner-content">
-      <h1>PGN - Regionalización Presupuesto Programación</h1>
-      <p>Consulte información sobre la regionalización del presupuesto de programación 
-        del Presupuesto General de la Nación por vigencia, periodo, departamento y fuente.
+      <h1>PGN - Regionalización Presupuesto Seguimiento</h1>
+      <p>Consulte información sobre la regionalización del presupuesto para seguimiento 
+        del Presupuesto General de la Nación por vigencia, periodo, región, departamento y fuente.
       </p>
     </div>
   </div>
@@ -45,6 +45,21 @@
             placeholder="Periodo">
           </p-select>
           <label for="periodoSelect">Periodo</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="p-field region-select">
+        <p-floatlabel class="w-full md:w-56" variant="on">
+          <p-select 
+            id="region" 
+            [options]="regiones" 
+            inputId="regionSelect" 
+            [(ngModel)]="selectedRegion"
+            (onChange)="onRegionChange($event)"
+            optionLabel="label" 
+            placeholder="Region">
+          </p-select>
+          <label for="regionSelect">Región</label>
         </p-floatlabel>
       </div>
 
@@ -132,35 +147,35 @@
 
             <!-- Two column items -->
             <div class="summary-item two-column">
-              <div class="summary-title">Total Presupuesto PGN - Inversión</div>
+              <div class="summary-title">Apropiación vigente</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacion.total_presupuesto_pgn_inversion )}}</div>
+                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacionSeguimiento.total_apropiacion_vigente )}}</div>
                 
-                <div class="summary-percentage">{{resumenDataRegionalizacion.porcentaje_total_presupuesto_pgn_inversion}}%</div>
+                <div class="summary-percentage">{{resumenDataRegionalizacionSeguimiento.porcentaje_total_apropiacion_vigente}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Regionalizado</div>
+              <div class="summary-title">Compromisos</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacion.total_regionalizado)}}</div>
-                <div class="summary-percentage">{{resumenDataRegionalizacion.porcentaje_regionalizado}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacionSeguimiento.total_compromisos)}}</div>
+                <div class="summary-percentage">{{resumenDataRegionalizacionSeguimiento.porcentaje_total_compromisos}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Nacional</div>
+              <div class="summary-title">Obligaciones</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacion.total_nacional)}}</div>
-                <div class="summary-percentage">{{resumenDataRegionalizacion.porcentaje_nacional}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacionSeguimiento.total_obligaciones)}}</div>
+                <div class="summary-percentage">{{resumenDataRegionalizacionSeguimiento.porcentaje_total_obligaciones}}%</div>
               </div>
             </div>
 
             <div class="summary-item two-column">
-              <div class="summary-title">Por Regionalizar</div>
+              <div class="summary-title">Pagos</div>
               <div class="summary-values">
-                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacion.total_por_regionalizar)}}</div>
-                <div class="summary-percentage">{{resumenDataRegionalizacion.porcentaje_por_regionalizar}}%</div>
+                <div class="summary-value">{{formatCurrency(resumenDataRegionalizacionSeguimiento.total_pagos)}}</div>
+                <div class="summary-percentage">{{resumenDataRegionalizacionSeguimiento.porcentaje_total_pagos}}%</div>
               </div>
             </div>
           </mat-card-content>
@@ -178,22 +193,28 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th>Departamento</th>
-                  <th class="text-right">{{selectedVigencia?.label}}</th>
-                  <th class="text-right">Per Capita</th>
+                  <th class="text-right">Apropiación Vigente</th>
+                  <th class="text-right">Compromisos</th>
+                  <th class="text-right">Obligaciones</th>
+                  <th class="text-right">Pagos</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-dept>
                 <tr>
                   <td>{{dept.departamento}}</td>
-                  <td class="text-right">{{formatCurrency(dept.total_presupuesto_pgn_inversion)}}</td>
-                  <td class="text-right">{{formatPercentage(dept.per_capita)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_apropiacion_vigente)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_compromisos)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_obligaciones)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_pagos)}}</td>
                 </tr>
               </ng-template>
               <ng-template pTemplate="footer">
                 <tr class="total-row">
                   <td><strong>Total General</strong></td>
-                  <td class="text-right"><strong>{{formatCurrency(getTotalVigencia())}}</strong></td>
-                  <td class="text-right"><strong>{{formatPercentage(getAveragePerCapita())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalApropiacionVigente())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalCompromisos())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalObligaciones())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalPagos())}}</strong></td>
                 </tr>
               </ng-template>
             </p-table>
