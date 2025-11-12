@@ -224,22 +224,28 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th>Departamento</th>
-                  <th class="text-right">{{selectedVigencia?.vigencia}}</th>
-                  <th class="text-right">Per Capita</th>
+                  <th class="text-right">Apropiación Vigente</th>
+                  <th class="text-right">Compromisos</th>
+                  <th class="text-right">Obligaciones</th>
+                  <th class="text-right">Pagos</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-dept>
                 <tr>
                   <td>{{dept.departamento}}</td>
-                  <td class="text-right">{{formatCurrency(dept.vigencia)}}</td>
-                  <td class="text-right">{{formatPercentage(dept.perCapita)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_apropiacion_vigente)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_compromisos)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_obligaciones)}}</td>
+                  <td class="text-right">{{formatCurrency(dept.total_pagos)}}</td>
                 </tr>
               </ng-template>
               <ng-template pTemplate="footer">
                 <tr class="total-row">
                   <td><strong>Total General</strong></td>
-                  <td class="text-right"><strong>{{formatCurrency(getTotalVigencia())}}</strong></td>
-                  <td class="text-right"><strong>{{formatPercentage(getAveragePerCapita())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalApropiacionVigente())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalCompromisos())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalObligaciones())}}</strong></td>
+                  <td class="text-right"><strong>{{formatCurrency(getTotalPagos())}}</strong></td>
                 </tr>
               </ng-template>
             </p-table>
