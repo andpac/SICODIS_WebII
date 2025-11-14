@@ -886,7 +886,9 @@ export class PresupuestoYRecaudoComponent implements OnInit {
    */
   private async cargarAsignaciones(): Promise<void> {
     try {
-      this.fuentesAsignacionesAPI = await this.sicodisApiService.getFuentesAsignaciones().toPromise() || [];
+      const idVigencia = parseInt(this.selectedVigencia.value);
+      
+      this.fuentesAsignacionesAPI = await this.sicodisApiService.getFuentesAsignaciones(idVigencia).toPromise() || [];
       console.log('Fuentes API cargadas:', this.fuentesAsignacionesAPI);
       this.inicializarAsignaciones();
     } catch (error) {

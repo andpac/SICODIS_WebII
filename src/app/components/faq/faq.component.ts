@@ -107,36 +107,36 @@ export class FaqComponent implements OnInit {
         }
       ]
     },
-    {
-      title: 'Herramientas de Consulta y Análisis',
-      icon: 'analytics',
-      items: [
-        {
-          title: '¿Cómo usar el tablero de control (Dashboard)?',
-          content: 'El dashboard presenta un resumen ejecutivo con las principales métricas del SGP y SGR, incluyendo gráficos interactivos y mapas de distribución territorial.',
-          route: 'dashboard',
-          value: '10'
-        },
-        {
-          title: '¿Qué información muestra el mapa de distribución?',
-          content: 'El mapa interactivo permite visualizar geográficamente la distribución de recursos del SGP y SGR por departamentos y municipios de Colombia.',
-          route: 'reports-map',
-          value: '11'
-        },
-        {
-          title: '¿Cómo usar el módulo de presupuesto y recaudo?',
-          content: 'Este módulo permite consultar y comparar información de presupuesto vigente con el recaudo efectivo, presentando análisis financieros detallados.',
-          route: 'presupuesto-y-recaudo',
-          value: '12'
-        },
-        {
-          title: '¿Qué herramientas adicionales están disponibles?',
-          content: 'En el baúl de herramientas encontrará utilidades adicionales como consulta de variables de distribución, históricos, proyecciones y análisis de eficiencia.',
-          route: 'tools',
-          value: '13'
-        }
-      ]
-    },
+    // {
+    //   title: 'Herramientas de Consulta y Análisis',
+    //   icon: 'analytics',
+    //   items: [
+    //     {
+    //       title: '¿Cómo usar el tablero de control (Dashboard)?',
+    //       content: 'El dashboard presenta un resumen ejecutivo con las principales métricas del SGP y SGR, incluyendo gráficos interactivos y mapas de distribución territorial.',
+    //       route: 'dashboard',
+    //       value: '10'
+    //     },
+    //     {
+    //       title: '¿Qué información muestra el mapa de distribución?',
+    //       content: 'El mapa interactivo permite visualizar geográficamente la distribución de recursos del SGP y SGR por departamentos y municipios de Colombia.',
+    //       route: 'reports-map',
+    //       value: '11'
+    //     },
+    //     {
+    //       title: '¿Cómo usar el módulo de presupuesto y recaudo?',
+    //       content: 'Este módulo permite consultar y comparar información de presupuesto vigente con el recaudo efectivo, presentando análisis financieros detallados.',
+    //       route: 'presupuesto-y-recaudo',
+    //       value: '12'
+    //     },
+    //     {
+    //       title: '¿Qué herramientas adicionales están disponibles?',
+    //       content: 'En el baúl de herramientas encontrará utilidades adicionales como consulta de variables de distribución, históricos, proyecciones y análisis de eficiencia.',
+    //       route: 'tools',
+    //       value: '13'
+    //     }
+    //   ]
+    // },
     {
       title: 'Conceptos y Definiciones',
       icon: 'help',
@@ -169,7 +169,7 @@ export class FaqComponent implements OnInit {
       items: [
         {
           title: '¿Cómo exportar la información consultada?',
-          content: 'La mayoría de módulos cuentan con botones de exportación que permiten descargar la información en formatos Excel, PDF o CSV para su análisis posterior.',
+          content: 'La mayoría de módulos cuentan con botones de exportación que permiten descargar la información en formato Excel para su análisis posterior.',
           value: '18'
         },
         {
@@ -179,7 +179,7 @@ export class FaqComponent implements OnInit {
         },
         {
           title: '¿Qué hacer si encuentro inconsistencias en los datos?',
-          content: 'Si identifica posibles inconsistencias en la información, puede reportarlas a través del formulario de PQRSD disponible en el sitio web del DNP o contactar directamente al equipo técnico.',
+          content: 'Si identifica posibles inconsistencias en la información, puede reportarlas a través del formulario de PQRSD disponible en el sitio web del DNP o contactar directamente al equipo técnico al correo sicodis@dnp.gov.co',
           value: '20'
         },
         {

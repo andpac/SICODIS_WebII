@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 // ========== SGR Funcionamiento Interfaces ==========
 export interface DiccionarioItem {
+  id_concepto: number;
   concepto: string;
   descripcion: string;
 }
@@ -45,6 +46,7 @@ export interface MunicipioFuncionamiento {
 export interface DistribucionTotal {
   id_vigencia: number;
   vigencia: string,
+  nombre_fuente: string,
   distribucion_presupuesto_corriente: number;
   distribucion_otros: number;
   total_asignado_bienio: number;
@@ -385,10 +387,11 @@ export class SicodisApiService {
 
   /**
    * Obtiene las fuentes de asignaciones del SGR Funcionamiento
+   * @param id_vigencia - ID vigencia
    * @returns Observable con el array de fuentes de asignación
    */
-  getFuentesAsignaciones(): Observable<FuenteAsignacion[]> {
-    const url = `${this.baseUrl}/sgrfun/fuentes_asignaciones`;
+  getFuentesAsignaciones(id_vigencia: number): Observable<FuenteAsignacion[]> {
+    const url = `${this.baseUrl}/sgrfun/fuentes_asignaciones/${id_vigencia}`;
     return this.http.get<FuenteAsignacion[]>(url);
   }
 

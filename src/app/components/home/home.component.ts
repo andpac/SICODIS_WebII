@@ -9,6 +9,7 @@ import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { ChartModule } from 'primeng/chart';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
 // Material Modules
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,7 +42,8 @@ import Chart from 'chart.js/auto';
     NumberFormatPipe,
     SafeGaugeComponent,
     TableModule,
-    ChartModule
+    ChartModule,
+    RouterModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -52,31 +54,27 @@ export class HomeComponent implements OnInit {
     {
       imageUrl: '/assets/img/target2.svg',
       date: 'Junio 3 de 2024',
-      description: 'Junio 3 de 2024',
-      title: 'Informe del Sistema General de Regalías',
-      buttonLabel: 'Ver Reportes'
+      description: '',
+      title: 'Informes y documentos del Sistema General de Regalías',
+      buttonLabel: 'Ver Reportes',
+      link: 'https://www.dnp.gov.co/LaEntidad_/subdireccion-general-inversiones-seguimiento-evaluacion/direccion-programacion-inversiones-publicas/Paginas/sistema-general-de-regalias.aspx'
     },
     {
-      imageUrl: '/assets/img/target1.svg',
+      imageUrl: '/assets/img/carrousel1.jpg',
       date: 'Junio 3 de 2024',
-      description: 'Junio 3 de 2024',
-      title: 'Informe del Sistema General de Participación',
-      buttonLabel: 'Ver Reportes'
+      description: '',
+      title: 'Documentos del Sistema General de Participaciones',
+      buttonLabel: 'Ver Reportes',
+      link: 'https://www.dnp.gov.co/LaEntidad_/subdireccion-general-inversiones-seguimiento-evaluacion/direccion-programacion-inversiones-publicas/Paginas/sistema-general-de-participaciones.aspx'
     },
     {
-      imageUrl: '/assets/img/target2.svg',
+      imageUrl: '/assets/img/carrousel2.jpg',
       date: 'Junio 3 de 2024',
-      description: 'Junio 3 de 2024',
-      title: 'Informe del Sistema General de Regalías',
-      buttonLabel: 'Ver Reportes'
-    },
-    {
-      imageUrl: '/assets/img/target1.svg',
-      date: 'Junio 3 de 2024',
-      description: 'Junio 3 de 2024',
-      title: 'Informe del Sistema General de Participación',
-      buttonLabel: 'Ver Reportes'
-    },
+      description: '',
+      title: 'Sobre distribución de recursos territoriales​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​',
+      buttonLabel: 'Ver Reportes',
+      link: 'https://www.dnp.gov.co/LaEntidad_/subdireccion-general-inversiones-seguimiento-evaluacion/direccion-programacion-inversiones-publicas/Paginas/distribucion-de-recursos-territoriales.aspx'
+    }
   ];
 
   highlightApps = [
@@ -178,36 +176,36 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  cards2: MyCard[] = [
-    {
-      title: 'Servicios Profesionales',
-      description: 'Ofrecemos servicios de alta calidad adaptados a sus necesidades específicas. Nuestro equipo de expertos está listo para ayudarte.',
-      imageUrl: '/assets/img/target2.svg',
-      date: 'Junio 3 de 2024',
-      buttonLabel: 'Ver Reportes'
-    },
-    {
-      title: 'Productos Innovadores',
-      description: 'Descubre nuestra línea de productos innovadores diseñados para mejorar tu vida diaria. Calidad y tecnología de vanguardia.',
-      imageUrl: '/assets/img/target1.svg',
-      date: 'Junio 3 de 2024',
-      buttonLabel: 'Explorar Más'
-    },
-    {
-      title: 'Nuestro Equipo',
-      description: 'Conoce al equipo de profesionales detrás de nuestro éxito. Personas apasionadas y comprometidas con la excelencia.',
-      imageUrl: '/assets/img/target2.svg',
-      date: 'Junio 3 de 2024',
-      buttonLabel: 'Conocer Equipo'
-    },
-    {
-      title: 'Contacto',
-      description: 'Estamos aquí para responder tus preguntas. Contáctanos y descubre cómo podemos ayudarte a alcanzar tus objetivos.',
-      imageUrl: '/assets/img/target1.svg',
-      date: 'Junio 3 de 2024',
-      buttonLabel: 'Contactar'
-    }
-  ];
+  // cards2: MyCard[] = [
+  //   {
+  //     title: 'Servicios Profesionales',
+  //     description: 'Ofrecemos servicios de alta calidad adaptados a sus necesidades específicas. Nuestro equipo de expertos está listo para ayudarte.',
+  //     imageUrl: '/assets/img/target2.svg',
+  //     date: 'Junio 3 de 2024',
+  //     buttonLabel: 'Ver Reportes'
+  //   },
+  //   {
+  //     title: 'Productos Innovadores',
+  //     description: 'Descubre nuestra línea de productos innovadores diseñados para mejorar tu vida diaria. Calidad y tecnología de vanguardia.',
+  //     imageUrl: '/assets/img/target1.svg',
+  //     date: 'Junio 3 de 2024',
+  //     buttonLabel: 'Explorar Más'
+  //   },
+  //   {
+  //     title: 'Nuestro Equipo',
+  //     description: 'Conoce al equipo de profesionales detrás de nuestro éxito. Personas apasionadas y comprometidas con la excelencia.',
+  //     imageUrl: '/assets/img/target2.svg',
+  //     date: 'Junio 3 de 2024',
+  //     buttonLabel: 'Conocer Equipo'
+  //   },
+  //   {
+  //     title: 'Contacto',
+  //     description: 'Estamos aquí para responder tus preguntas. Contáctanos y descubre cómo podemos ayudarte a alcanzar tus objetivos.',
+  //     imageUrl: '/assets/img/target1.svg',
+  //     date: 'Junio 3 de 2024',
+  //     buttonLabel: 'Contactar'
+  //   }
+  // ];
 
   titleSGR = 'Sistema General de Regalías - SGR';
   titleSGP = 'Sistema General de Participaciones - SGP';
@@ -707,4 +705,5 @@ export interface MyCard {
   imageUrl: string;
   buttonLabel: string;
   date: string;
+  link: string;
 }

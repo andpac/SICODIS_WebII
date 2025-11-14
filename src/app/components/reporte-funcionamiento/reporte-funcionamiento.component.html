@@ -119,8 +119,8 @@
 
   <div class="dates-buttons-container">
     <div style="width: 84%;">
-      <p class="date-update">Fecha de actualización: junio 30 de 2025</p>
-      <p class="date-update">Fecha de corte de recaudo: mayo 30 de 2025</p>
+      <p class="date-update">Fecha de actualización: octubre 31 de 2025</p>
+      <p class="date-update">Fecha de corte de recaudo: septiembre 30 de 2025</p>
     </div>
     <div style="position: relative; padding-bottom: .25rem;">
       <button pButton type="button" label="Diccionario" class="p-button-secondary" style="margin-right: 1.7rem; width: 90px;"
@@ -318,7 +318,7 @@
       </mat-card-header>
       <mat-card-content>
         <div style="display: table-row;width: 100%;;">
-          <div *ngFor="let registro of (selectedBeneficiario.length > 1 ? distribucionTotalMultiple : distribucionTotal)">
+          <div *ngFor="let registro of (selectedBeneficiario.length > 0 ? distribucionTotalMultiple : distribucionTotal)">
             <div class="detail-grid">
               <div class="detail-item">
                 <strong>Fuente:</strong> {{registro.fuente_principal || 'N/A'}}

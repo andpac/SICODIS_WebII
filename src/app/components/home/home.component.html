@@ -244,16 +244,21 @@
     <div class="grid-container" style="margin-bottom: 2.5rem;">
       <mat-grid-list [cols]="cols" rowHeight="300px" gutterSize="16">
         <mat-grid-tile *ngFor="let card of cards">
-          <mat-card class="card-container">
-            <img mat-card-image [src]="card.imageUrl" [alt]="card.title + ' - Imagen ilustrativa'">
-            <p class="description">{{card.description}}</p>
-            <mat-card-header>
-              <h3 class="sicodis-title">{{card.title}}</h3>
-            </mat-card-header>                
-          </mat-card>
+          <a [href]="card.link" target="_blank" rel="noopener" class="link-wrapper">
+            <mat-card class="card-container">
+              <img mat-card-image [src]="card.imageUrl" [alt]="card.title + ' - Imagen ilustrativa'">
+              <p class="description">{{card.description}}</p>
+              <mat-card-header>
+                <h3 class="sicodis-title">{{card.title}}</h3>
+              </mat-card-header>                
+            </mat-card>
+          </a>
         </mat-grid-tile>
       </mat-grid-list>
     </div>
+
+
+
     
     <div class="sicodis-questions" style="display:none;">
       <img class="overlay-questions" src="/assets/img/overlay-questions.svg" alt="Imagen decorativa de preguntas frecuentes">

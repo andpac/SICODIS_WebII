@@ -253,7 +253,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
   ngOnInit(): void {
     this.items = [
-        { label: 'Reporte de Funcionamiento' }        
+        { label: 'Reporte de FuncionamienReporte de administración y SSEC' }        
     ];
 
     this.home = { icon: 'pi pi-home', routerLink: '/' };
@@ -267,13 +267,32 @@ export class ReporteFuncionamientoComponent implements OnInit {
       }
 
       // Cargar datos API en paralelo para optimizar rendimiento
-      await this.cargarDatosAPIIniciales();
       await this.cargarVigencias();
+      await this.cargarDatosAPIIniciales();
+
       
       // Inicializar componentes de UI
       this.inicializarFuentesVacio();
       this.inicializarDepartamentos();
-      
+
+      // Si no selecciona nada → seleccionar TOTAL automáticamente
+      if (!this.selectedFuente || this.selectedFuente.length === 0) {
+        const total = this.fuentes.find((f: any) => f.label === 'TOTAL');
+        if (total) {
+          this.selectedFuente = [total];
+          this.cargarConceptosDesdeFuentes();
+          const totalConcepto = this.conceptos.find(c => c.label === 'TOTAL');
+          if (totalConcepto) {
+            this.selectedConcepto = [totalConcepto];
+            this.cargarBeneficiariosDesdeConcetos();
+            const totalBeneficiario = this.beneficiarios.find(c => c.label === 'TOTAL');
+            if (totalBeneficiario){
+              this.selectedBeneficiario = [totalBeneficiario];
+            }
+          }
+
+        }
+      }      
       // Cargar datos iniciales desde API
       if (this.selectedVigencia) {
         await this.cargarDistribucionTotalDesdeAPI();
@@ -405,6 +424,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
     this.siglasDiccionarioData.diccionario.data.forEach((item: DiccionarioItem) => {
       contenido += `<tr>
+        <td style="border: 1px solid #dee2e6; padding: 8px; vertical-align: top; font-weight: 100;"><strong>${item.id_concepto}</strong></td>
         <td style="border: 1px solid #dee2e6; padding: 8px; vertical-align: top; font-weight: 500;"><strong>${item.concepto}</strong></td>
         <td style="border: 1px solid #dee2e6; padding: 8px; vertical-align: top;">${item.descripcion}</td>
       </tr>`;
@@ -503,15 +523,15 @@ export class ReporteFuncionamientoComponent implements OnInit {
         this.beneficiarios = [{ value: "0", label: "TOTAL" }];
         
         // Pre-seleccionar "TOTAL" en todos los filtros
-        this.selectedFuente = [{
-          value: 0,
-          label: "TOTAL"
-        }];
+        // this.selectedFuente = [{
+        //   value: 0,
+        //   label: "TOTAL"
+        // }];
 
-        this.selectedConcepto = [{
-          value: "TOTAL",
-          label: "TOTAL"
-        }];
+        // this.selectedConcepto = [{
+        //   value: "0",
+        //   label: "TOTAL"
+        // }];
 
         this.selectedBeneficiario = [{
           value: "TOTAL",
@@ -651,7 +671,9 @@ export class ReporteFuncionamientoComponent implements OnInit {
   private async cargarDatosAPIIniciales(): Promise<void> {
     try {
       // Cargar fuentes desde el endpoint fuentes_asignaciones una sola vez
-      this.fuentesAsignacionesAPI = await this.sicodisApiService.getFuentesAsignaciones().toPromise() || [];
+      const idVigencia = parseInt(this.selectedVigencia.id);
+    
+      this.fuentesAsignacionesAPI = await this.sicodisApiService.getFuentesAsignaciones(idVigencia).toPromise() || [];
       console.log('Fuentes API cargadas:', this.fuentesAsignacionesAPI);
     } catch (error) {
       console.warn('Error cargando fuentes desde API, se usarán datos locales como fallback:', error);
@@ -699,7 +721,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
       }
       
       // Inicializar los otros selects como vacíos
-      this.conceptos = [{ value: "0", label: "TOTAL" }];
+      //this.conceptos = [{ value: "0", label: "TOTAL" }];
       this.beneficiarios = [{ value: "0", label: "TOTAL" }];
       this.selectedFuente = [];
       this.selectedConcepto = [];
@@ -723,7 +745,49 @@ export class ReporteFuncionamientoComponent implements OnInit {
    */
   onFuenteChange(event: MultiSelectChangeEvent): void {
     console.log('Fuentes seleccionadas:', event.value);
+    console.log('Item actual:', event.itemValue);    
     this.showDetailInfo = false;
+
+    // --- Si ya estaba TOTAL y el usuario intenta desmarcarlo, no hacer nada ---
+    if (
+      (!event.value || event.value.length === 0) &&
+      event.itemValue?.label === 'TOTAL'
+    ) {
+      // Restaurar TOTAL y salir sin hacer nada más
+      setTimeout(() => {
+        const total = this.fuentes.find((f: any) => f.label === 'TOTAL');
+        this.selectedFuente = [total];
+      });
+      return;
+    }
+
+    // Si seleccionó TOTAL → dejar solo TOTAL
+    if (event.itemValue.label === 'TOTAL') {
+      this.selectedFuente = [event.itemValue];
+    }
+    // Si seleccionó otro y ya estaba TOTAL → quitar TOTAL
+    else {
+      this.selectedFuente = event.value.filter((f: any) => f.label !== 'TOTAL');
+    }
+
+    // Si selecciona todos los elementos excepto TOTAL → cambiar a TOTAL
+    const totalFuentesDisponibles = this.fuentes.length;
+    const totalSeleccionadas = this.selectedFuente.length;
+    const incluyeTotal = this.selectedFuente.some((f: any) => f.label === 'TOTAL');
+
+    if (!incluyeTotal && totalSeleccionadas === totalFuentesDisponibles - 1) {
+      const total = this.fuentes.find((f: any) => f.label === 'TOTAL');
+      this.selectedFuente = [total];
+    }
+
+    // Si no selecciona nada → seleccionar TOTAL automáticamente
+    if (!this.selectedFuente || this.selectedFuente.length === 0) {
+      const total = this.fuentes.find((f: any) => f.label === 'TOTAL');
+      if (total) {
+        this.selectedFuente = [total];
+      }
+    }
+
     try {
       // Limpiar selecciones dependientes
       this.selectedConcepto = [];
@@ -749,7 +813,10 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
       // Obtener conceptos para todas las fuentes seleccionadas usando API
       this.cargarConceptosDesdeFuentes();
-      
+      const totalConcepto = this.conceptos.find(c => c.label === 'TOTAL');
+      if (totalConcepto) {
+            this.selectedConcepto = [totalConcepto];
+      }
       // Llamar a la API para actualizar los datos con los nuevos filtros
       this.cargarDistribucionTotalDesdeAPI();
       
@@ -880,7 +947,52 @@ export class ReporteFuncionamientoComponent implements OnInit {
    */
   onConceptoChange(event: MultiSelectChangeEvent): void {
     console.log('Conceptos seleccionados:', event.value);
+    console.log('Item actual:', event.itemValue);    
     this.showDetailInfo = false;
+
+    // --- Si ya estaba TOTAL y el usuario intenta desmarcarlo, no hacer nada ---
+    if (
+      (!event.value || event.value.length === 0) &&
+      event.itemValue?.label === 'TOTAL'
+    ) {
+      // Restaurar TOTAL y salir sin hacer nada más
+      setTimeout(() => {
+        const total = this.conceptos.find((f: any) => f.label === 'TOTAL');
+        this.selectedConcepto = [total];
+      });
+      return;
+    }
+
+
+
+    // Si seleccionó TOTAL → dejar solo TOTAL
+    if (event.itemValue.label === 'TOTAL') {
+      this.selectedConcepto = [event.itemValue];
+    }
+    // Si seleccionó otro y ya estaba TOTAL → quitar TOTAL
+    else {
+      this.selectedConcepto = event.value.filter((f: any) => f.label !== 'TOTAL');
+    }
+
+    // Si selecciona todos los elementos excepto TOTAL → cambiar a TOTAL
+    const totalConceptosDisponibles = this.conceptos.length;
+    const totalSeleccionadas = this.selectedConcepto.length;
+    const incluyeTotal = this.selectedConcepto.some((f: any) => f.label === 'TOTAL');
+
+    if (!incluyeTotal && totalSeleccionadas === totalConceptosDisponibles - 1) {
+      const total = this.conceptos.find((f: any) => f.label === 'TOTAL');
+      this.selectedConcepto = [total];
+    }
+
+    // Si no selecciona nada → seleccionar TOTAL automáticamente
+    if (!this.selectedConcepto || this.selectedConcepto.length === 0) {
+      const total = this.conceptos.find((f: any) => f.label === 'TOTAL');
+      if (total) {
+        this.selectedConcepto = [total];
+      }
+    }
+
+
     try {
       // Limpiar selección de beneficiario
       this.selectedBeneficiario = [];
@@ -889,18 +1001,18 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
       if (!this.selectedFuente || this.selectedFuente.length === 0 || 
           !event.value || event.value.length === 0) {
-        this.beneficiarios = [];
+        this.beneficiarios = []; 
         return;
       }
 
       // Manejar la exclusión mutua con TOTAL
-      this.selectedConcepto = this.manejarSeleccionTOTAL(event.value, 'concepto');
-      if (this.selectedConcepto.length === 1 && this.selectedConcepto[0].label === "TOTAL") {
-        // Si solo TOTAL está seleccionado, configurar opciones dependientes
-        this.beneficiarios = [{ value: "0", label: "TOTAL" }];
-        this.cargarDatosTotalesInicial();
-        return;
-      }
+      //this.selectedConcepto = this.manejarSeleccionTOTAL(event.value, 'concepto');
+      // if (this.selectedConcepto.length === 1 && this.selectedConcepto[0].label === "TOTAL") {
+      //   // Si solo TOTAL está seleccionado, configurar opciones dependientes
+      //   this.beneficiarios = [{ value: "0", label: "TOTAL" }];
+      //   this.cargarDatosTotalesInicial();
+      //   return;
+      // }
 
       // Cargar beneficiarios (entidades) desde API usando conceptos seleccionados
       this.cargarBeneficiariosDesdeConcetos();
@@ -929,7 +1041,9 @@ export class ReporteFuncionamientoComponent implements OnInit {
       // Obtener los IDs de las fuentes para poder obtener los conceptos con sus IDs
       const idsFuentesSeleccionadas: number[] = [];
       this.selectedFuente.forEach((fuenteSeleccionada: any) => {
-        if (fuenteSeleccionada.label !== "TOTAL") {
+        if (typeof fuenteSeleccionada.value === 'number') {
+          idsFuentesSeleccionadas.push(fuenteSeleccionada.value);
+        } else {
           const fuenteEncontrada = this.fuentesAsignacionesAPI.find(f => f.fuente === fuenteSeleccionada.label);
           if (fuenteEncontrada) {
             idsFuentesSeleccionadas.push(fuenteEncontrada.id_fuente);
@@ -1233,7 +1347,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
       // CASO 3: Múltiples beneficiarios seleccionados (sin TOTAL)
       
-      if (this.selectedBeneficiario.length > 1) {
+      if (this.selectedBeneficiario.length > 0) {
         // Si hay más de un beneficiario seleccionado, llamar getDistribucionTotal por cada uno
         this.cargarDistribucionTotalPorCadaBeneficiario();
       } 
@@ -1255,7 +1369,8 @@ export class ReporteFuncionamientoComponent implements OnInit {
     this.selectedVigencia = event.value;
     
     // Cargar datos de distribución total desde API basado en la vigencia seleccionada
-    this.cargarDistribucionTotalDesdeAPI();
+    this.cargarDatosAPIIniciales();    
+    this.cargarDistribucionTotalDesdeAPI();    
   }
 
   /**
@@ -1278,7 +1393,8 @@ export class ReporteFuncionamientoComponent implements OnInit {
           
           if (distribucionBeneficiario && distribucionBeneficiario.length > 0) {
             // Obtener la fuente específica para este beneficiario
-            const fuenteDelBeneficiario = this.obtenerFuenteParaBeneficiario(beneficiario);
+            //const fuenteDelBeneficiario = this.obtenerFuenteParaBeneficiario(beneficiario);
+            const fuenteDelBeneficiario = distribucionBeneficiario[0].nombre_fuente;
             
             // Agregar identificador del beneficiario y fuente correcta a cada registro
             const distribucionConBeneficiario = distribucionBeneficiario.map((registro: any) => ({
@@ -1290,7 +1406,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
                 value: beneficiario.value
               },
               fuente_asociada: fuenteDelBeneficiario,
-              fuente_principal: fuenteDelBeneficiario ? fuenteDelBeneficiario.label : 'N/A'
+              fuente_principal: fuenteDelBeneficiario ??  'N/A'
             }));
             
             this.distribucionTotalMultiple.push(...distribucionConBeneficiario);
