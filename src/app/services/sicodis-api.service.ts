@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { Observable, forkJoin, throwError } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
+import { User, CreateUserRequest, UpdateUserRequest, UserListResponse } from '../models/user.interface';
+import { Profile } from '../models/profile.interface';
 
 
 
@@ -1248,6 +1250,112 @@ export class SicodisApiService {
           map(resp => resp.token) // opcional: si quieres devolver solo el token
         );
     }
+
+
+  // ========== ADMIN - User Management Methods ==========
+
+  /**
+   * Obtiene la lista de usuarios con paginación y filtros
+   * @param params - Parámetros de filtrado opcionales (page, limit, search)
+   * @returns Observable con la lista de usuarios
+   */
+  getUsuarios(params?: { page?: number; limit?: number; search?: string }): Observable<UserListResponse> {
+    const url = `${this.baseUrl}/admin/usuarios`;
+    let httpParams = new HttpParams();
+
+    if (params?.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params?.search) httpParams = httpParams.set('search', params.search);
+
+    return this.http.get<UserListResponse>(url, { params: httpParams });
+  }
+
+  /**
+   * Obtiene un usuario por ID
+   * @param id - ID del usuario
+   * @returns Observable con el usuario
+   */
+  getUsuarioById(id: number): Observable<User> {
+    const url = `${this.baseUrl}/admin/usuarios/${id}`;
+    return this.http.get<User>(url);
+  }
+
+  /**
+   * Crea un nuevo usuario
+   * @param usuario - Datos del usuario a crear
+   * @returns Observable con el usuario creado
+   */
+  createUsuario(usuario: CreateUserRequest): Observable<User> {
+    const url = `${this.baseUrl}/admin/usuarios`;
+    return this.http.post<User>(url, usuario).pipe(
+      tap(response => console.log('✅ Usuario creado:', response)),
+      catchError(error => {
+        console.error('❌ Error creando usuario:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Actualiza un usuario existente
+   * @param id - ID del usuario
+   * @param usuario - Datos actualizados del usuario
+   * @returns Observable con el usuario actualizado
+   */
+  updateUsuario(id: number, usuario: UpdateUserRequest): Observable<User> {
+    const url = `${this.baseUrl}/admin/usuarios/${id}`;
+    return this.http.put<User>(url, usuario).pipe(
+      tap(response => console.log('✅ Usuario actualizado:', response)),
+      catchError(error => {
+        console.error('❌ Error actualizando usuario:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Elimina un usuario (soft delete)
+   * @param id - ID del usuario
+   * @returns Observable con el resultado
+   */
+  deleteUsuario(id: number): Observable<void> {
+    const url = `${this.baseUrl}/admin/usuarios/${id}`;
+    return this.http.delete<void>(url).pipe(
+      tap(() => console.log('✅ Usuario eliminado:', id)),
+      catchError(error => {
+        console.error('❌ Error eliminando usuario:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Obtiene todos los perfiles disponibles
+   * @returns Observable con la lista de perfiles
+   */
+  getPerfiles(): Observable<Profile[]> {
+    const url = `${this.baseUrl}/admin/perfiles`;
+    return this.http.get<Profile[]>(url);
+  }
+
+  /**
+   * Obtiene el usuario actual autenticado
+   * @returns Observable con el usuario actual
+   */
+  getCurrentUser(): Observable<User> {
+    const url = `${this.baseUrl}/auth/me`;
+    return this.http.get<User>(url);
+  }
+
+  /**
+   * Actualiza el perfil del usuario actual
+   * @param updates - Campos a actualizar (solo nombre, teléfono, extensión)
+   * @returns Observable con el usuario actualizado
+   */
+  updateOwnProfile(updates: Partial<User>): Observable<User> {
+    const url = `${this.baseUrl}/auth/me`;
+    return this.http.patch<User>(url, updates);
+  }
 
 
 }

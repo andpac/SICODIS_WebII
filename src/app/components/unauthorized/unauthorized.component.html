@@ -1,0 +1,51 @@
+<div class="unauthorized-container">
+  <div class="unauthorized-content">
+    <p-card styleClass="unauthorized-card">
+      <ng-template pTemplate="header">
+        <div class="card-icon">
+          <i class="pi pi-lock"></i>
+        </div>
+      </ng-template>
+
+      <div class="card-content">
+        <h1>Acceso No Autorizado</h1>
+        <p class="main-message">
+          Lo sentimos, no tiene permisos para acceder a este recurso.
+        </p>
+        <p class="sub-message">
+          Si cree que esto es un error, por favor contacte al administrador del sistema.
+        </p>
+
+        <div class="error-details">
+          <div class="detail-item">
+            <i class="pi pi-info-circle"></i>
+            <span>Código de error: 403 - Forbidden</span>
+          </div>
+          <div class="detail-item">
+            <i class="pi pi-shield"></i>
+            <span>Se requieren permisos de administrador</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <div class="card-actions">
+          <button
+            pButton
+            label="Volver Atrás"
+            icon="pi pi-arrow-left"
+            class="p-button-secondary"
+            (click)="goBack()"
+          ></button>
+          <button
+            pButton
+            label="Ir al Inicio"
+            icon="pi pi-home"
+            class="p-button-primary"
+            (click)="goHome()"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

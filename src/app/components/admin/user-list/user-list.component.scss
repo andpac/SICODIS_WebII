@@ -1,0 +1,125 @@
+.user-list-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.gradient-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .banner-content {
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+
+      i {
+        font-size: 1.5rem;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+  }
+}
+
+.filters-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .search-container {
+    flex: 1;
+    min-width: 300px;
+
+    .search-input {
+      width: 100%;
+      max-width: 500px;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.text-green-500 {
+  color: #22c55e;
+  font-size: 1.25rem;
+}
+
+.text-red-500 {
+  color: #ef4444;
+  font-size: 1.25rem;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .user-list-container {
+    padding: 1rem;
+  }
+
+  .gradient-banner {
+    padding: 1.5rem;
+
+    .banner-content h1 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .filters-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-container {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// PrimeNG table customizations
+::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background-color: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .p-datatable-tbody > tr {
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+
+  .p-breadcrumb {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+}

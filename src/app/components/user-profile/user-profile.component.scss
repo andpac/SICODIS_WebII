@@ -1,0 +1,266 @@
+.user-profile-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gradient-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .banner-content {
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+
+      i {
+        font-size: 1.5rem;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+  }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #6c757d;
+
+  i {
+    margin-bottom: 1rem;
+    color: #667eea;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.profile-content {
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+
+    .profile-card-section,
+    .info-card-section {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+.profile-form {
+  padding: 1.5rem;
+
+  .p-field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+
+      &.required::after {
+        content: ' *';
+        color: #ef4444;
+      }
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .readonly-field {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    .field-help {
+      display: block;
+      margin-top: 0.25rem;
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+}
+
+.info-section {
+  padding: 1.5rem;
+
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    > i {
+      font-size: 1.5rem;
+      color: #667eea;
+      margin-top: 0.25rem;
+    }
+
+    .info-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .info-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+      }
+
+      .info-value {
+        color: #6c757d;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .profile-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+.text-green-500 {
+  color: #22c55e;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .profile-content .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-profile-container {
+    padding: 1rem;
+  }
+
+  .gradient-banner {
+    padding: 1.5rem;
+
+    .banner-content h1 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .profile-form .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// PrimeNG customizations
+::ng-deep {
+  .p-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+
+    .p-card-header {
+      padding: 0;
+    }
+
+    .p-card-body {
+      padding: 0;
+    }
+
+    .p-card-content {
+      padding: 0;
+    }
+  }
+
+  .p-inputtext {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: all 0.2s;
+
+    &:enabled:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    &:disabled,
+    &[readonly] {
+      background-color: #e9ecef;
+    }
+  }
+
+  .p-tag {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+  }
+
+  .p-breadcrumb {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+}

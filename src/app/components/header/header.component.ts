@@ -10,6 +10,8 @@ import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { DOCUMENT } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +34,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private userService: UserService,
+    private authService: AuthService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -190,8 +194,73 @@ export class HeaderComponent implements OnInit, OnDestroy {
           //   label: 'Manual de usuario'
           // }
         ]
-      }      
+      }
     ];
+
+    // Agregar menú de Administración solo para administradores
+    if (this.isAdmin()) {
+      this.items.push({
+        label: 'Administración',
+        icon: 'pi pi-shield',
+        items: [
+          {
+            label: 'Gestión de Usuarios',
+            icon: 'pi pi-users',
+            command: () => this.redirectUrl('admin/usuarios')
+          }
+        ]
+      });
+    }
+
+    // Agregar menú de usuario (siempre visible si está autenticado)
+    if (this.isAuthenticated()) {
+      const currentUser = this.userService.getCurrentUserValue();
+      const userName = currentUser?.nombre_usuario || 'Usuario';
+
+      this.items.push({
+        label: userName,
+        icon: 'pi pi-user',
+        items: [
+          {
+            label: 'Mi Perfil',
+            icon: 'pi pi-id-card',
+            command: () => this.redirectUrl('mi-perfil')
+          },
+          {
+            separator: true
+          },
+          {
+            label: 'Cerrar Sesión',
+            icon: 'pi pi-sign-out',
+            command: () => this.logout()
+          }
+        ]
+      });
+    }
+  }
+
+  /**
+   * Verifica si el usuario está autenticado
+   */
+  isAuthenticated(): boolean {
+    return this.authService.hasValidToken();
+  }
+
+  /**
+   * Verifica si el usuario es administrador
+   */
+  isAdmin(): boolean {
+    return this.userService.isAdmin();
+  }
+
+  /**
+   * Cierra sesión del usuario
+   */
+  logout(): void {
+    this.authService.clearToken();
+    this.userService.clearCurrentUser();
+    this.route.navigate(['/']);
+  
   }
 
   ngOnDestroy() {

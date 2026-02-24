@@ -1,0 +1,164 @@
+<div class="user-list-container">
+  <!-- Breadcrumb Navigation -->
+  <p-breadcrumb [model]="breadcrumbItems" [home]="homeItem" class="mb-4"></p-breadcrumb>
+
+  <!-- Header Banner -->
+  <div class="gradient-banner mb-5">
+    <div class="banner-content">
+      <h1>
+        <i class="pi pi-users mr-2"></i>
+        Administración » Gestión de Usuarios
+      </h1>
+      <p>Gestione los usuarios del sistema SICODIS y sus permisos</p>
+    </div>
+  </div>
+
+  <!-- Filters and Actions -->
+  <div class="filters-actions mb-4">
+    <div class="search-container">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar usuario por nombre, login o entidad..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="search-input"
+        />
+      </p-iconfield>
+    </div>
+
+    <button
+      pButton
+      label="Nuevo usuario"
+      icon="pi pi-plus"
+      class="p-button-primary"
+      (click)="openNewUserDialog()"
+    ></button>
+  </div>
+
+  <!-- Users Table -->
+  <p-table
+    [value]="users"
+    [paginator]="true"
+    [rows]="rowsPerPage"
+    [totalRecords]="totalRecords"
+    [loading]="isLoading()"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-striped"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 80px">ID</th>
+        <th>Nombre de Usuario</th>
+        <th>Login</th>
+        <th>Entidad/Dependencia</th>
+        <th style="width: 150px; text-align: center">Auth DNP</th>
+        <th style="width: 120px; text-align: center">Estado</th>
+        <th style="width: 200px; text-align: center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.id_usuario }}</td>
+        <td>
+          <strong>{{ user.nombre_usuario }}</strong>
+          <br />
+          <small class="text-muted">{{ user.cargo }}</small>
+        </td>
+        <td>{{ user.login }}</td>
+        <td>{{ user.entidad }}</td>
+        <td style="text-align: center">
+          <i
+            [class]="
+              user.usa_autenticacion_dnp
+                ? 'pi pi-check text-green-500'
+                : 'pi pi-times text-red-500'
+            "
+            [pTooltip]="
+              user.usa_autenticacion_dnp
+                ? 'Usa autenticación DNP'
+                : 'Autenticación local'
+            "
+            tooltipPosition="top"
+          ></i>
+        </td>
+        <td style="text-align: center">
+          <p-tag
+            [value]="getStatusText(user.activo)"
+            [severity]="getStatusSeverity(user.activo)"
+          ></p-tag>
+        </td>
+        <td style="text-align: center">
+          <div class="action-buttons">
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-info"
+              (click)="viewUser(user)"
+              pTooltip="Ver detalles"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-warning"
+              (click)="editUser(user)"
+              pTooltip="Editar"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="confirmDelete(user)"
+              pTooltip="Eliminar"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem">
+          <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc"></i>
+          <p style="margin-top: 1rem; color: #666">
+            {{ searchTerm ? 'No se encontraron usuarios' : 'No hay usuarios registrados' }}
+          </p>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          <p style="margin-top: 1rem">Cargando usuarios...</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- User Detail Dialog -->
+<app-user-detail
+  [(visible)]="displayDialog"
+  [userId]="selectedUserId"
+  [mode]="dialogMode"
+  (onSave)="handleUserSaved()"
+></app-user-detail>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>

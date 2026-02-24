@@ -1,0 +1,145 @@
+.unauthorized-container {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.unauthorized-content {
+  max-width: 600px;
+  width: 100%;
+}
+
+.card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  i {
+    font-size: 4rem;
+    color: white;
+  }
+}
+
+.card-content {
+  text-align: center;
+  padding: 2rem 1.5rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+  }
+
+  .main-message {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .sub-message {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0 0 2rem 0;
+  }
+
+  .error-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #ef4444;
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #4b5563;
+      font-size: 0.9rem;
+
+      i {
+        color: #ef4444;
+        font-size: 1.1rem;
+      }
+
+      span {
+        text-align: left;
+      }
+    }
+  }
+}
+
+.card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .unauthorized-container {
+    padding: 1rem;
+  }
+
+  .card-content {
+    padding: 1.5rem 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    .main-message {
+      font-size: 1rem;
+    }
+  }
+
+  .card-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .card-icon {
+    padding: 1.5rem;
+
+    i {
+      font-size: 3rem;
+    }
+  }
+}
+
+// PrimeNG customizations
+::ng-deep {
+  .unauthorized-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+
+    .p-card-header {
+      padding: 0;
+    }
+
+    .p-card-body {
+      padding: 0;
+    }
+
+    .p-card-content {
+      padding: 0;
+    }
+
+    .p-card-footer {
+      padding: 0;
+    }
+  }
+}

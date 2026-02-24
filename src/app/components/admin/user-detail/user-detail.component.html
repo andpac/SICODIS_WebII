@@ -1,0 +1,239 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="onCancel()"
+  styleClass="user-detail-dialog"
+>
+  <ng-template pTemplate="header">
+    <h3 class="dialog-title">
+      <i class="pi pi-user mr-2"></i>
+      {{ dialogTitle }}
+    </h3>
+  </ng-template>
+
+  <div class="user-form" *ngIf="!isLoading()">
+    <!-- ID Usuario (solo en modo edición/vista) -->
+    <div class="p-field" *ngIf="mode !== 'create' && user.id_usuario">
+      <label for="id_usuario">ID Usuario</label>
+      <input
+        type="text"
+        pInputText
+        id="id_usuario"
+        [value]="user.id_usuario"
+        readonly
+        class="readonly-field"
+      />
+    </div>
+
+    <!-- Nombre de Usuario -->
+    <div class="p-field">
+      <label for="nombre_usuario" class="required">Nombre de Usuario</label>
+      <input
+        type="text"
+        pInputText
+        id="nombre_usuario"
+        [(ngModel)]="user.nombre_usuario"
+        [readonly]="isReadOnly"
+        placeholder="Ingrese el nombre completo del usuario"
+        class="full-width"
+      />
+    </div>
+
+    <!-- Login -->
+    <div class="p-field">
+      <label for="login" class="required">Login</label>
+      <input
+        type="text"
+        pInputText
+        id="login"
+        [(ngModel)]="user.login"
+        [readonly]="isReadOnly"
+        placeholder="Ingrese el login del usuario"
+        class="full-width"
+      />
+      <small class="field-help">Usuario único para acceder al sistema</small>
+    </div>
+
+    <!-- Entidad -->
+    <div class="p-field">
+      <label for="entidad" class="required">Entidad / Dependencia</label>
+      <input
+        type="text"
+        pInputText
+        id="entidad"
+        [(ngModel)]="user.entidad"
+        [readonly]="isReadOnly"
+        placeholder="Ingrese la entidad o dependencia"
+        class="full-width"
+      />
+    </div>
+
+    <!-- Checkboxes en dos columnas -->
+    <div class="checkbox-row">
+      <!-- Utiliza autenticación DNP -->
+      <div class="p-field checkbox-field">
+        <p-checkbox
+          [(ngModel)]="user.usa_autenticacion_dnp"
+          [binary]="true"
+          inputId="usa_autenticacion_dnp"
+          [disabled]="isReadOnly"
+        ></p-checkbox>
+        <label for="usa_autenticacion_dnp">¿Utiliza autenticación DNP?</label>
+      </div>
+
+      <!-- Directorio Activo -->
+      <div class="p-field checkbox-field">
+        <p-checkbox
+          [(ngModel)]="user.directorio_activo"
+          [binary]="true"
+          inputId="directorio_activo"
+          [disabled]="isReadOnly"
+        ></p-checkbox>
+        <label for="directorio_activo">¿Directorio Activo?</label>
+      </div>
+    </div>
+
+    <!-- Cargo -->
+    <div class="p-field">
+      <label for="cargo">Cargo</label>
+      <input
+        type="text"
+        pInputText
+        id="cargo"
+        [(ngModel)]="user.cargo"
+        [readonly]="isReadOnly"
+        placeholder="Ingrese el cargo del usuario"
+        class="full-width"
+      />
+    </div>
+
+    <!-- Teléfono y Extensión en dos columnas -->
+    <div class="two-column-row">
+      <div class="p-field">
+        <label for="telefono">Teléfono</label>
+        <input
+          type="text"
+          pInputText
+          id="telefono"
+          [(ngModel)]="user.telefono"
+          [readonly]="isReadOnly"
+          placeholder="Ej: 3001234567"
+          class="full-width"
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="extension">Extensión</label>
+        <input
+          type="text"
+          pInputText
+          id="extension"
+          [(ngModel)]="user.extension"
+          [readonly]="isReadOnly"
+          placeholder="Ej: 101"
+          class="full-width"
+        />
+      </div>
+    </div>
+
+    <!-- Estado Activo -->
+    <div class="p-field checkbox-field estado-field">
+      <p-checkbox
+        [(ngModel)]="user.activo"
+        [binary]="true"
+        inputId="activo"
+        [disabled]="isReadOnly"
+      ></p-checkbox>
+      <label for="activo">
+        <strong>Estado: Activo</strong>
+      </label>
+    </div>
+
+    <!-- Perfiles -->
+    <div class="p-field perfiles-section">
+      <label class="required">Perfiles</label>
+      <div class="perfiles-grid">
+        <div
+          *ngFor="let profile of availableProfiles"
+          class="p-field checkbox-field"
+        >
+          <p-checkbox
+            [(ngModel)]="selectedProfiles[profile.id_perfil]"
+            [binary]="true"
+            [inputId]="'profile_' + profile.id_perfil"
+            [disabled]="isReadOnly"
+          ></p-checkbox>
+          <label [for]="'profile_' + profile.id_perfil">
+            {{ profile.nombre_perfil }}
+          </label>
+        </div>
+      </div>
+      <small class="field-help">Seleccione al menos un perfil</small>
+    </div>
+
+    <!-- Metadata (solo en modo edición/vista) -->
+    <div class="metadata-section" *ngIf="mode !== 'create' && user.id_usuario">
+      <div class="metadata-divider"></div>
+      <div class="metadata-row">
+        <div class="metadata-item">
+          <strong>Fecha Actualización:</strong>
+          <span>{{ user.fecha_actualizacion | date : 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="metadata-item">
+          <strong>Usuario Actualización:</strong>
+          <span>{{ user.usuario_actualizacion || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading()">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    <p>Cargando información del usuario...</p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <!-- Botón Volver -->
+      <button
+        pButton
+        label="Volver"
+        icon="pi pi-times"
+        class="p-button-secondary"
+        (click)="onCancel()"
+        [disabled]="isSaving()"
+      ></button>
+
+      <!-- Botón Reporte (solo en modo vista/edición) -->
+      <button
+        *ngIf="mode !== 'create'"
+        pButton
+        label="Reporte Usuarios"
+        icon="pi pi-file"
+        class="p-button-info"
+        (click)="generateReport()"
+        [disabled]="isSaving()"
+      ></button>
+
+      <!-- Botón Guardar/Actualizar (no en modo vista) -->
+      <button
+        *ngIf="!isReadOnly"
+        pButton
+        [label]="mode === 'create' ? 'Crear Usuario' : 'Actualizar'"
+        icon="pi pi-check"
+        class="p-button-primary"
+        (click)="handleSave()"
+        [disabled]="!isFormValid() || isSaving()"
+        [loading]="isSaving()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>

@@ -5,10 +5,10 @@ import { ReportsSgpComponent } from './components/reports-sgp/reports-sgp.compon
 import { ReportsMapComponent } from './components/reports-map/reports-map.component';
 import { ReportsSgpDistComponent } from './components/reports-sgp-dist/reports-sgp-dist.component';
 import { ReportsSgpBudgetComponent } from './components/reports-sgp-budget/reports-sgp-budget.component';
-import { ReportsSgrBienalComponent } from './components/reports-sgr-bienal/reports-sgr-bienal.component';
+import { SgrPlanBienalCajaComponent } from './components/sgr-plan-bienal-caja/sgr-plan-bienal-caja.component';
 import { ReportsSgrComparativeComponent } from './components/reports-sgr-comparative/reports-sgr-comparative.component';
 import { IacComparativeVsBudgetComponent} from './components/iac-comparative-vs-budget/iac-comparative-vs-budget.component';
-import { ReportsSgrResumenPlanRecursosComponent} from './components/reports-sgr-resumen-plan-recursos/reports-sgr-resumen-plan-recursos.component';
+import { SgrPlanBienalRecursosComponent } from './components/sgr-plan-bienal-recursos/sgr-plan-bienal-recursos.component';
 import { FaqComponent } from './components/faq/faq.component';
 import { ToolsComponent } from './components/tools/tools.component';
 import { ComparativoIacVsPresupuestoComponent } from './components/comparativo-iac-vs-presupuesto/comparativo-iac-vs-presupuesto.component';
@@ -34,16 +34,21 @@ import { SgrMontosCorrientesConstantesComponent } from './components/sgr-montos-
 import { PgnInversionPorSectorComponent } from './components/pgn-inversion-por-sector/pgn-inversion-por-sector.component';
 import { PgnRegionalizacionPresupuestoSeguimientoComponent } from './components/pgn-regionalizacion-presupuesto-seguimiento/pgn-regionalizacion-presupuesto-seguimiento.component';
 
+// User Management Imports
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
+import { UserListComponent } from './components/admin/user-list/user-list.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'reports-sgr', component: ReportsSgrComponent },    
     { path: 'reports-sgp-dist', component: ReportsSgpDistComponent },
-    { path: 'reports-sgp-budget', component: ReportsSgpBudgetComponent },
-    { path: 'reports-sgr-bienal', component: ReportsSgrBienalComponent },
+    { path: 'reports-sgp-budget', component: ReportsSgpBudgetComponent },    
     { path: 'reports-sgr-comparative', component: ReportsSgrComparativeComponent },    
     { path: 'iac-comparative-vs-budget', component: IacComparativeVsBudgetComponent },
-    { path: 'comparativo-iac-presupuesto', component: ComparativoIacVsPresupuestoComponent },
-    { path: 'reports-sgr-resumen-plan-recursos', component: ReportsSgrResumenPlanRecursosComponent },
+    { path: 'comparativo-iac-presupuesto', component: ComparativoIacVsPresupuestoComponent },    
     { path: 'faq', component: FaqComponent },
     { path: 'tools', component: ToolsComponent },
     { path: 'dashboard', component: DashboardComponent },
@@ -65,8 +70,44 @@ export const routes: Routes = [
     { path: 'sgr-programacion', component: SgrProgramacionComponent },
     { path: 'sgr-recaudo-directas', component: SgrRecaudoDirectasComponent },
     { path: 'sgr-montos-corrientes-constantes', component: SgrMontosCorrientesConstantesComponent },
+    { path: 'sgr-plan-de-recursos', component: SgrPlanBienalRecursosComponent },
+    { path: 'sgr-plan-bienal-caja', component: SgrPlanBienalCajaComponent },
     { path: 'pgn-inversion-por-sector', component:PgnInversionPorSectorComponent},
     { path: 'pgn-regionalizacion', component: PgnRegionalizacionPresupuestoProgramacionComponent },
     { path: 'pgn-seguimiento', component: PgnRegionalizacionPresupuestoSeguimientoComponent },
-    { path: 'pgn-comparativa-regionalizacion', component: PgnComparativaRegionalizacionComponent },    
+    { path: 'pgn-comparativa-regionalizacion', component: PgnComparativaRegionalizacionComponent },
+
+    // ========== User Management Routes ==========
+    // Administración (protegido solo para administradores)
+    {
+        path: 'admin',
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['SuperAdministrador', 'Administrador'] },
+        children: [
+            {
+                path: 'usuarios',
+                component: UserListComponent,
+                data: { breadcrumb: 'Gestión de Usuarios' }
+            },
+            {
+                path: '',
+                redirectTo: 'usuarios',
+                pathMatch: 'full'
+            }
+        ]
+    },
+
+    // Perfil de usuario (solo autenticado, sin restricción de rol)
+    {
+        path: 'mi-perfil',
+        component: UserProfileComponent,
+        canActivate: [authGuard],
+        data: { breadcrumb: 'Mi Perfil' }
+    },
+
+    // Página de acceso no autorizado
+    {
+        path: 'unauthorized',
+        component: UnauthorizedComponent
+    }
 ];
