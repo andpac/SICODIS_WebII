@@ -1,0 +1,595 @@
+{
+  "baseUrl": "https://sicodis.dnp.gov.co",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "deviceScaleFactor": 2,
+  "screenshots": [
+    {
+      "id": "menu-principal",
+      "path": "assets/general/menu-principal.png",
+      "url": "/",
+      "description": "Menú principal con todas las opciones desplegadas",
+      "actions": [
+        "waitForSelector('.header-menu')",
+        "hover('.menu-sgp')",
+        "wait(500)"
+      ],
+      "fullPage": false,
+      "usedIn": ["02-navegacion-general.md"]
+    },
+    {
+      "id": "elementos-comunes",
+      "path": "assets/general/elementos-comunes.png",
+      "url": "/",
+      "description": "Header, breadcrumbs y footer visibles",
+      "actions": [
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["02-navegacion-general.md"]
+    },
+    {
+      "id": "filtros-cascada",
+      "path": "assets/general/filtros-cascada.png",
+      "url": "/sgp-inicio",
+      "description": "Ejemplo de filtros en cascada: Vigencia → Departamento → Municipio",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "screenshot('.filtros-panel')"
+      ],
+      "fullPage": false,
+      "selector": ".filtros-panel",
+      "usedIn": ["02-navegacion-general.md"]
+    },
+    {
+      "id": "opciones-descarga",
+      "path": "assets/general/opciones-descarga.png",
+      "url": "/sgp-inicio",
+      "description": "Botones de descarga y exportación",
+      "actions": [
+        "waitForSelector('button:has-text(\"Descargar\")')",
+        "screenshot('.export-buttons')"
+      ],
+      "fullPage": false,
+      "selector": ".export-buttons",
+      "usedIn": ["02-navegacion-general.md"]
+    },
+    {
+      "id": "sgp-componentes",
+      "path": "assets/sgp/sgp-componentes.png",
+      "url": "/sgp-inicio",
+      "description": "Diagrama de componentes del SGP (si está disponible en la UI)",
+      "actions": [
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": false,
+      "usedIn": ["03-sgp/03-00-sgp-introduccion.md"]
+    },
+    {
+      "id": "sgp-resumen-completo",
+      "path": "assets/sgp/sgp-resumen-completo.png",
+      "url": "/sgp-inicio",
+      "description": "Vista completa del módulo SGP Resumen con datos del 2025",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-01-sgp-resumen.md"]
+    },
+    {
+      "id": "sgp-resumen-tarjetas",
+      "path": "assets/sgp/sgp-resumen-tarjetas.png",
+      "url": "/sgp-inicio",
+      "description": "Tarjetas de métricas principales del SGP",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "screenshot('.cards-container')"
+      ],
+      "fullPage": false,
+      "selector": ".cards-container",
+      "usedIn": ["03-sgp/03-01-sgp-resumen.md"]
+    },
+    {
+      "id": "sgp-resumen-treetable",
+      "path": "assets/sgp/sgp-resumen-treetable.png",
+      "url": "/sgp-inicio",
+      "description": "TreeTable jerárquica con conceptos expandidos",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "click('button.p-treetable-toggler:first-of-type')",
+        "wait(500)",
+        "screenshot('p-treetable')"
+      ],
+      "fullPage": false,
+      "selector": "p-treetable",
+      "usedIn": ["03-sgp/03-01-sgp-resumen.md"]
+    },
+    {
+      "id": "sgp-documentos-anexos-completo",
+      "path": "assets/sgp/sgp-documentos-anexos-completo.png",
+      "url": "/sgp-documentos-anexos",
+      "description": "Vista completa del módulo SGP Documentos Anexos",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-02-sgp-documentos-anexos.md"]
+    },
+    {
+      "id": "sgp-documentos-modal-archivos",
+      "path": "assets/sgp/sgp-documentos-modal-archivos.png",
+      "url": "/sgp-documentos-anexos",
+      "description": "Modal con lista de archivos adjuntos",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "click('button:has-text(\"Ver archivos\")')",
+        "wait(1000)"
+      ],
+      "fullPage": false,
+      "usedIn": ["03-sgp/03-02-sgp-documentos-anexos.md"]
+    },
+    {
+      "id": "sgp-detalle-presupuestal-completo",
+      "path": "assets/sgp/sgp-detalle-presupuestal-completo.png",
+      "url": "/sgp-detalle-presupuestal",
+      "description": "Vista completa del módulo SGP Detalle Presupuestal",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[formControlName=\"departamento\"]', '15')",
+        "wait(500)",
+        "select('select[formControlName=\"municipio\"]', '15001')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-03-sgp-detalle-presupuestal.md"]
+    },
+    {
+      "id": "sgp-detalle-tarjetas-metricas",
+      "path": "assets/sgp/sgp-detalle-tarjetas-metricas.png",
+      "url": "/sgp-detalle-presupuestal",
+      "description": "Tarjetas de métricas: Total Asignado, Última Doceava, Once Doceavas",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[formControlName=\"departamento\"]', '15')",
+        "wait(500)",
+        "select('select[formControlName=\"municipio\"]', '15001')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "screenshot('.metrics-cards')"
+      ],
+      "fullPage": false,
+      "selector": ".metrics-cards",
+      "usedIn": ["03-sgp/03-03-sgp-detalle-presupuestal.md"]
+    },
+    {
+      "id": "sgp-comparativo-completo",
+      "path": "assets/sgp/sgp-comparativo-completo.png",
+      "url": "/sgp-comparativa",
+      "description": "Vista completa del módulo SGP Comparativo con dos municipios",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[name=\"departamento1\"]', '15')",
+        "wait(500)",
+        "select('select[name=\"municipio1\"]', '15001')",
+        "select('select[name=\"departamento2\"]', '25')",
+        "wait(500)",
+        "select('select[name=\"municipio2\"]', '25001')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-04-sgp-comparativo.md"]
+    },
+    {
+      "id": "sgp-comparativo-graficas",
+      "path": "assets/sgp/sgp-comparativo-graficas.png",
+      "url": "/sgp-comparativa",
+      "description": "Gráficas paralelas de comparación",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[name=\"departamento1\"]', '15')",
+        "wait(500)",
+        "select('select[name=\"municipio1\"]', '15001')",
+        "select('select[name=\"departamento2\"]', '25')",
+        "wait(500)",
+        "select('select[name=\"municipio2\"]', '25001')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "screenshot('.comparison-charts')"
+      ],
+      "fullPage": false,
+      "selector": ".comparison-charts",
+      "usedIn": ["03-sgp/03-04-sgp-comparativo.md"]
+    },
+    {
+      "id": "sgp-historico-completo",
+      "path": "assets/sgp/sgp-historico-completo.png",
+      "url": "/sgp-historico",
+      "description": "Vista completa del módulo SGP Histórico con múltiples años",
+      "actions": [
+        "waitForSelector('.year-selector')",
+        "click('input[type=\"checkbox\"][value=\"2020\"]')",
+        "click('input[type=\"checkbox\"][value=\"2021\"]')",
+        "click('input[type=\"checkbox\"][value=\"2022\"]')",
+        "click('input[type=\"checkbox\"][value=\"2023\"]')",
+        "click('input[type=\"checkbox\"][value=\"2024\"]')",
+        "click('input[type=\"checkbox\"][value=\"2025\"]')",
+        "select('select[formControlName=\"departamento\"]', '15')",
+        "wait(500)",
+        "select('select[formControlName=\"municipio\"]', '15001')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(4000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-05-sgp-historico.md"]
+    },
+    {
+      "id": "sgp-historico-grafica-apilada",
+      "path": "assets/sgp/sgp-historico-grafica-apilada.png",
+      "url": "/sgp-historico",
+      "description": "Gráfico de barras apiladas por conceptos",
+      "actions": [
+        "waitForSelector('.year-selector')",
+        "click('input[type=\"checkbox\"][value=\"2020\"]')",
+        "click('input[type=\"checkbox\"][value=\"2021\"]')",
+        "click('input[type=\"checkbox\"][value=\"2022\"]')",
+        "click('input[type=\"checkbox\"][value=\"2023\"]')",
+        "click('input[type=\"checkbox\"][value=\"2024\"]')",
+        "click('input[type=\"checkbox\"][value=\"2025\"]')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(4000)",
+        "screenshot('.stacked-chart')"
+      ],
+      "fullPage": false,
+      "selector": ".stacked-chart",
+      "usedIn": ["03-sgp/03-05-sgp-historico.md"]
+    },
+    {
+      "id": "sgp-eficiencias-completo",
+      "path": "assets/sgp/sgp-eficiencias-completo.png",
+      "url": "/sgp-eficiencias",
+      "description": "Vista completa del módulo SGP Eficiencias",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[formControlName=\"departamento\"]', '15')",
+        "wait(500)",
+        "select('select[formControlName=\"municipio\"]', '15001')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["03-sgp/03-06-sgp-eficiencias.md"]
+    },
+    {
+      "id": "sgp-eficiencias-secciones",
+      "path": "assets/sgp/sgp-eficiencias-secciones.png",
+      "url": "/sgp-eficiencias",
+      "description": "Secciones expandibles de eficiencias",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[formControlName=\"departamento\"]', '15')",
+        "wait(500)",
+        "select('select[formControlName=\"municipio\"]', '15001')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "click('.accordion-header:first-of-type')",
+        "wait(500)",
+        "screenshot('.accordion-container')"
+      ],
+      "fullPage": false,
+      "selector": ".accordion-container",
+      "usedIn": ["03-sgp/03-06-sgp-eficiencias.md"]
+    },
+    {
+      "id": "sgr-recaudo-mensual-completo",
+      "path": "assets/sgr/sgr-recaudo-mensual-completo.png",
+      "url": "/sgr-recaudo-mensual",
+      "description": "Vista completa del módulo SGR Recaudo Mensual",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-01-sgr-recaudo-mensual.md"]
+    },
+    {
+      "id": "sgr-recaudo-mensual-graficas",
+      "path": "assets/sgr/sgr-recaudo-mensual-graficas.png",
+      "url": "/sgr-recaudo-mensual",
+      "description": "Gráficas de recaudo: Minería vs Hidrocarburos",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "screenshot('.recaudo-charts')"
+      ],
+      "fullPage": false,
+      "selector": ".recaudo-charts",
+      "usedIn": ["04-sgr/04-01-sgr-recaudo-mensual.md"]
+    },
+    {
+      "id": "sgr-recaudo-directas-completo",
+      "path": "assets/sgr/sgr-recaudo-directas-completo.png",
+      "url": "/sgr-recaudo-directas",
+      "description": "Vista completa del módulo SGR Recaudo Directas",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "select('select[formControlName=\"departamento\"]', '08')",
+        "wait(500)",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-02-sgr-recaudo-directas.md"]
+    },
+    {
+      "id": "sgr-presupuesto-recaudo-completo",
+      "path": "assets/sgr/sgr-presupuesto-recaudo-completo.png",
+      "url": "/sgr-presupuesto-y-recaudo",
+      "description": "Vista completa del módulo SGR Presupuesto y Recaudo",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-03-sgr-presupuesto-recaudo.md"]
+    },
+    {
+      "id": "sgr-presupuesto-treetable",
+      "path": "assets/sgr/sgr-presupuesto-treetable.png",
+      "url": "/sgr-presupuesto-y-recaudo",
+      "description": "TreeTable jerárquica de presupuesto SGR",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "screenshot('p-treetable')"
+      ],
+      "fullPage": false,
+      "selector": "p-treetable",
+      "usedIn": ["04-sgr/04-03-sgr-presupuesto-recaudo.md"]
+    },
+    {
+      "id": "sgr-funcionamiento-completo",
+      "path": "assets/sgr/sgr-funcionamiento-completo.png",
+      "url": "/reporte-funcionamiento",
+      "description": "Vista completa del módulo SGR Funcionamiento SSEC",
+      "actions": [
+        "waitForSelector('select[formControlName=\"fuenteAsignacion\"]')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-04-sgr-funcionamiento-ssec.md"]
+    },
+    {
+      "id": "sgr-plan-recursos-completo",
+      "path": "assets/sgr/sgr-plan-recursos-completo.png",
+      "url": "/sgr-plan-recursos",
+      "description": "Vista completa del módulo SGR Plan de Recursos (10 años)",
+      "actions": [
+        "waitForSelector('select[formControlName=\"plan\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-05-sgr-plan-recursos.md"]
+    },
+    {
+      "id": "sgr-plan-recursos-grafico",
+      "path": "assets/sgr/sgr-plan-recursos-grafico.png",
+      "url": "/sgr-plan-recursos",
+      "description": "Gráfico de barras comparativo 10 años",
+      "actions": [
+        "waitForSelector('select[formControlName=\"plan\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "screenshot('.plan-chart')"
+      ],
+      "fullPage": false,
+      "selector": ".plan-chart",
+      "usedIn": ["04-sgr/04-05-sgr-plan-recursos.md"]
+    },
+    {
+      "id": "sgr-plan-bienal-completo",
+      "path": "assets/sgr/sgr-plan-bienal-completo.png",
+      "url": "/sgr-plan-bienal-de-caja",
+      "description": "Vista completa del módulo SGR Plan Bienal de Caja (24 meses)",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-06-sgr-plan-bienal-caja.md"]
+    },
+    {
+      "id": "sgr-plan-bienal-grafico-mensual",
+      "path": "assets/sgr/sgr-plan-bienal-grafico-mensual.png",
+      "url": "/sgr-plan-bienal-de-caja",
+      "description": "Gráfico de barras agrupadas por 24 meses",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "screenshot('.monthly-chart')"
+      ],
+      "fullPage": false,
+      "selector": ".monthly-chart",
+      "usedIn": ["04-sgr/04-06-sgr-plan-bienal-caja.md"]
+    },
+    {
+      "id": "sgr-comparativo-completo",
+      "path": "assets/sgr/sgr-comparativo-completo.png",
+      "url": "/sgr-comparativo",
+      "description": "Vista completa del módulo SGR Comparativo",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2024-2025')",
+        "select('select[name=\"departamento1\"]', '08')",
+        "wait(500)",
+        "select('select[name=\"municipio1\"]', '08001')",
+        "select('select[name=\"departamento2\"]', '20')",
+        "wait(500)",
+        "select('select[name=\"municipio2\"]', '20001')",
+        "click('button:has-text(\"Aplicar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["04-sgr/04-07-sgr-comparativo.md"]
+    },
+    {
+      "id": "pgn-regionalizacion-completo",
+      "path": "assets/pgn/pgn-regionalizacion-completo.png",
+      "url": "/pgn-regionalizacion",
+      "description": "Vista completa del módulo PGN Regionalización Programación",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["05-pgn/05-01-pgn-regionalizacion-programacion.md"]
+    },
+    {
+      "id": "pgn-regionalizacion-gauge",
+      "path": "assets/pgn/pgn-regionalizacion-gauge.png",
+      "url": "/pgn-regionalizacion",
+      "description": "Gráfico Doughnut gauge con 3 segmentos",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "screenshot('.gauge-chart')"
+      ],
+      "fullPage": false,
+      "selector": ".gauge-chart",
+      "usedIn": ["05-pgn/05-01-pgn-regionalizacion-programacion.md"]
+    },
+    {
+      "id": "pgn-seguimiento-completo",
+      "path": "assets/pgn/pgn-seguimiento-completo.png",
+      "url": "/pgn-seguimiento",
+      "description": "Vista completa del módulo PGN Seguimiento",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["05-pgn/05-02-pgn-regionalizacion-seguimiento.md"]
+    },
+    {
+      "id": "pgn-seguimiento-tabla",
+      "path": "assets/pgn/pgn-seguimiento-tabla.png",
+      "url": "/pgn-seguimiento",
+      "description": "Tabla departamental con 5 columnas de ejecución",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "screenshot('.execution-table')"
+      ],
+      "fullPage": false,
+      "selector": ".execution-table",
+      "usedIn": ["05-pgn/05-02-pgn-regionalizacion-seguimiento.md"]
+    },
+    {
+      "id": "pgn-inversion-sector-completo",
+      "path": "assets/pgn/pgn-inversion-sector-completo.png",
+      "url": "/pgn-inversion-por-sector",
+      "description": "Vista completa del módulo PGN Inversión por Sector",
+      "actions": [
+        "waitForSelector('select[formControlName=\"vigencia\"]')",
+        "select('select[formControlName=\"vigencia\"]', '2025')",
+        "select('select[formControlName=\"sector\"]', '1')",
+        "wait(500)",
+        "click('button:has-text(\"Actualizar\")')",
+        "wait(3000)",
+        "waitForLoadState('networkidle')"
+      ],
+      "fullPage": true,
+      "usedIn": ["05-pgn/05-03-pgn-inversion-sector.md"]
+    },
+    {
+      "id": "pgn-inversion-filtros-cascada",
+      "path": "assets/pgn/pgn-inversion-filtros-cascada.png",
+      "url": "/pgn-inversion-por-sector",
+      "description": "7 filtros en cascada del módulo",
+      "actions": [
+        "waitForSelector('.filters-container')",
+        "screenshot('.filters-container')"
+      ],
+      "fullPage": false,
+      "selector": ".filters-container",
+      "usedIn": ["05-pgn/05-03-pgn-inversion-sector.md"]
+    },
+    {
+      "id": "faq-vista",
+      "path": "assets/general/faq-vista.png",
+      "url": "/faq",
+      "description": "Vista del componente FAQ con preguntas frecuentes",
+      "actions": [
+        "waitForLoadState('networkidle')",
+        "click('.accordion-header:first-of-type')",
+        "wait(500)"
+      ],
+      "fullPage": true,
+      "usedIn": ["06-ayuda/06-00-preguntas-frecuentes.md"]
+    }
+  ]
+}
