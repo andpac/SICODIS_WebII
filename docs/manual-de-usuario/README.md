@@ -45,6 +45,57 @@ Ver archivo [CHANGELOG.md](./CHANGELOG.md) para el historial completo de cambios
 ### PGN - Presupuesto General de la Nación
 3 módulos de consulta sobre regionalización del presupuesto nacional.
 
+## Generación de Screenshots
+
+Este manual incluye un sistema automatizado para generar screenshots de todos los módulos de SICODIS utilizando Playwright.
+
+### Instalación Rápida
+
+```bash
+# Instalar dependencias
+npm install
+
+# Instalar navegador Chromium
+npx playwright install chromium
+```
+
+### Comandos Disponibles
+
+```bash
+# Generar todos los screenshots
+npm run screenshots
+
+# Listar screenshots disponibles
+npm run screenshots:list
+
+# Generar screenshots específicos
+npm run screenshots menu-principal sgp-resumen-completo
+
+# Optimizar imágenes generadas
+npm run screenshots:optimize
+
+# Generar y optimizar todo
+npm run screenshots:all
+```
+
+### Documentación Completa
+
+Ver [SCREENSHOTS.md](./SCREENSHOTS.md) para:
+- Guía completa de uso
+- Cómo agregar nuevos screenshots
+- Solución de problemas
+- Configuración avanzada
+
+### Estructura de Assets
+
+```
+assets/
+├── general/     # Screenshots de navegación general
+├── sgp/         # Screenshots del SGP
+├── sgr/         # Screenshots del SGR
+└── pgn/         # Screenshots del PGN
+```
+
 ## Contacto
 - **Email**: sicodis@dnp.gov.co
 - **Sitio web**: https://sicodis.dnp.gov.co
@@ -54,4 +105,4 @@ Ver archivo [CHANGELOG.md](./CHANGELOG.md) para el historial completo de cambios
 Este manual es de carácter público y está diseñado para facilitar el uso del sistema SICODIS por parte de funcionarios públicos, analistas y ciudadanos interesados en información sobre transferencias fiscales en Colombia.
 
 ---
-*Última actualización del README: 2026-04-09*
+*Última actualización del README: 2026-04-12*
