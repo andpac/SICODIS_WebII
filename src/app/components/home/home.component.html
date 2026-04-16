@@ -1,79 +1,129 @@
 <div class="container">
     <section aria-labelledby="titulo-bienvenida">
-    <div class="gradient-banner">
-      <div class="gradient-overlay"></div>
-      <div class="banner-content">
-        <h1 id="titulo-bienvenida">Bienvenido a SICODIS</h1>
-        <p>El Sistema de información y consulta de distribuciones de recursos "SICODIS", presenta información agregada y detallada,
-          correspondiente a las distribuciones de los recursos del Sistema General de Regalías (SGR), Sistema General de Participaciones (SGP) y la Regionalización del Presupuesto General de la Nación realizadas por el DNP.
-        </p>
+      <div class="gradient-banner">
+        <div class="gradient-overlay" aria-hidden="true"></div>
+        <div class="banner-content">
+          <h1 id="titulo-bienvenida">Bienvenido a SICODIS</h1>
+          <p>
+            El Sistema de información y consulta de distribuciones de recursos "SICODIS",
+            presenta información agregada y detallada, correspondiente a las distribuciones
+            de los recursos del
+            <strong class="text-sgp">Sistema General de Participaciones (SGP)</strong>,
+            <strong class="text-sgr">Sistema General de Regalías (SGR)</strong> y la
+            <strong class="text-pgn">Regionalización del Presupuesto General de la Nación (PGN)</strong>
+            realizadas por el DNP.
+          </p>
+        </div>
       </div>
-    </div>
     </section>
     <section aria-label="Sistemas de información disponibles">
     <div class="reports">
         <div class="grid-container">
           <mat-grid-list [cols]="cols2" rowHeight="500" gutterSize="16">
             <mat-grid-tile>
-              <p-card class="card-container sgp-card">
+              <p-card class="card-container sgp-card" [attr.aria-label]="'Tarjeta de ' + titleSGP">
                 <div class="card-header">
-                  <img class="img-icon" src="/assets/img/icon-sgp.png" alt="Icono del Sistema General de Participaciones">
-                  <h2 class="sicodis-large-title">{{titleSGP}}</h2>
+                  <div class="icon-circle icon-circle-sgp" aria-hidden="true">
+                    <img class="img-icon" src="/assets/img/icon-sgp.png" alt="">
+                  </div>
+                  <h2 class="sicodis-large-title">
+                    {{titleSGP}}
+                    <span class="badge badge-sgp" style="margin-left: 0.5rem; font-size: 0.75rem;">SGP</span>
+                  </h2>
                 </div>
                 <div class="card-description">
                   <p>{{descriptionSGP}}</p>
                 </div>
-                <div class="card-menu">
-                  <button type="button" class="sicodis-item" (click)="redirectTo('sgp-documentos-anexos')">
+                <nav class="card-menu" aria-label="Menú de reportes SGP">
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('sgp-documentos-anexos')"
+                          aria-label="Ir a distribución presupuestal, documentos y anexos">
                     <span>Distribución presupuestal, documentos y anexos</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
                   <p-divider/>
-                  <button type="button" class="sicodis-item" (click)="redirectTo('sgp-comparativa')">
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('sgp-comparativa')"
+                          aria-label="Ir a ficha comparativa de distribución">
                     <span>Ficha comparativa de distribución</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
                   <p-divider />
-                  <button type="button" class="sicodis-item" (click)="redirectTo('sgp-detalle-presupuestal')">
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('sgp-detalle-presupuestal')"
+                          aria-label="Ir a ficha SGP presupuestal">
                     <span>Ficha SGP - Presupuestal</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
-                </div>
+                </nav>
                 <ng-template pTemplate="footer">
                   <div class="card-footer">
-                    <button pButton type="button" label="Ver todos los reportes del SGP" (click)="redirectSGP()" class="p-button-primary"></button>
+                    <button pButton
+                            type="button"
+                            label="Ver todos los reportes del SGP"
+                            (click)="redirectSGP()"
+                            class="p-button-primary"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            aria-label="Ver todos los reportes del Sistema General de Participaciones">
+                    </button>
                   </div>
                 </ng-template>
               </p-card>
             </mat-grid-tile>
             <mat-grid-tile>
-              <p-card class="card-container sgr-card">
+              <p-card class="card-container sgr-card" [attr.aria-label]="'Tarjeta de ' + titleSGR">
                 <div class="card-header">
-                  <img class="img-icon" src="/assets/img/icon-sgr.png" alt="Icono del Sistema General de Regalías">
-                  <h2 class="sicodis-large-title">{{titleSGR}}</h2>
+                  <div class="icon-circle icon-circle-sgr" aria-hidden="true">
+                    <img class="img-icon" src="/assets/img/icon-sgr.png" alt="">
+                  </div>
+                  <h2 class="sicodis-large-title">
+                    {{titleSGR}}
+                    <span class="badge badge-sgr" style="margin-left: 0.5rem; font-size: 0.75rem;">SGR</span>
+                  </h2>
                 </div>
                 <div class="card-description">
                   <p>{{descriptionSGR}}</p>
                 </div>
-                <div class="card-menu">
-                  <p-divider/>
-                  <button type="button" class="sicodis-item" (click)="redirectTo('sgr-recaudo-mensual')">
+                <nav class="card-menu" aria-label="Menú de reportes SGR">                  
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('sgr-recaudo-mensual')"
+                          aria-label="Ir a recaudo mensual">
                     <span>Recaudo mensual</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
                   <p-divider />
-                  <button type="button" class="sicodis-item" (click)="redirectTo('sgr-presupuesto-y-recaudo')">
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('sgr-presupuesto-y-recaudo')"
+                          aria-label="Ir a recaudo frente a presupuesto">
                     <span>Recaudo frente a presupuesto</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
-                  <button type="button" class="sicodis-item" (click)="redirectTo('reporte-funcionamiento')">
+                  <p-divider />
+                  <button type="button"
+                          class="sicodis-item"
+                          (click)="redirectTo('reporte-funcionamiento')"
+                          aria-label="Ir a administración y sistema de seguimiento del SGR">
                     <span>Administración y Sistema de Seguimiento del SGR</span>
-                    <span class="pi pi-angle-right" aria-hidden="true"></span>
+                    <i class="pi pi-angle-right" aria-hidden="true"></i>
                   </button>
-                </div>
+                </nav>
                 <ng-template pTemplate="footer">
                   <div class="card-footer">
-                    <button pButton type="button" label="Ver todos los reportes del SGR" (click)="redirectSGR()" class="p-button-primary"></button>
+                    <button pButton
+                            type="button"
+                            label="Ver todos los reportes del SGR"
+                            (click)="redirectSGR()"
+                            class="p-button-primary"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            aria-label="Ver todos los reportes del Sistema General de Regalías">
+                    </button>
                   </div>
                 </ng-template>
               </p-card>
@@ -81,36 +131,57 @@
           </mat-grid-list>
         </div>
 
-        <div class="grid-container" style="margin-top: 16px;">          
-              <p-card class="card-container pgn-card pgn-full-width">
+        <div class="grid-container" style="margin-top: var(--sp-md);">
+              <p-card class="card-container pgn-card pgn-full-width" [attr.aria-label]="'Tarjeta de ' + titlePGN">
                 <div class="card-header">
-                  <img class="img-icon" src="/assets/img/icon-pgn.png" alt="Icono del Presupuesto General de la Nación">
-                  <h2 class="sicodis-large-title">{{titlePGN}}</h2>
+                  <div class="icon-circle icon-circle-pgn" aria-hidden="true">
+                    <img class="img-icon" src="/assets/img/icon-pgn.png" alt="">
+                  </div>
+                  <h2 class="sicodis-large-title">
+                    {{titlePGN}}
+                    <span class="badge badge-pgn" style="margin-left: 0.5rem; font-size: 0.65rem;">PGN</span>
+                  </h2>
                 </div>
                 <div class="card-description">
                   <p>{{descriptionPGN}}</p>
                 </div>
                 <ng-template pTemplate="footer">
                   <div class="card-footer">
-                    <button pButton type="button" label="Ver información del PGN" (click)="redirectTo('pgn-regionalizacion')" class="p-button-primary"></button>
+                    <button pButton
+                            type="button"
+                            label="Ver información del PGN"
+                            (click)="redirectTo('pgn-regionalizacion')"
+                            class="p-button-primary"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            aria-label="Ver información del Presupuesto General de la Nación">
+                    </button>
                   </div>
                 </ng-template>
-              </p-card>          
+              </p-card>
         </div>
 
     </div> <!-- /reports -->
     </section> <!-- /sistemas de información -->
 
     <section aria-labelledby="titulo-cifras">
-    <div class="reports">
-    <h2 id="titulo-cifras" class="sicodis sicodis-subtitle">Consulte a continuación la información vigente de los dos sistemas</h2>
-    <p class="sicodis-p">Cifras en pesos corrientes</p>
+      <div class="reports">
+        <h2 id="titulo-cifras" class="sicodis sicodis-subtitle">
+          Consulte a continuación la información vigente de los dos sistemas
+        </h2>
+        <p class="sicodis-p">
+          <i class="pi pi-info-circle" aria-hidden="true" style="margin-right: 0.25rem;"></i>
+          Cifras en pesos corrientes
+        </p>
 
     <div class="assignment-cards">
-      <mat-grid-list [cols]="2" rowHeight="870px" gutterSize="8">
+      <mat-grid-list [cols]="2" rowHeight="950px" gutterSize="8">
         <mat-grid-tile style="align-items: flex-start;">
-          <mat-card class="card-container" style="height: 80%; display: flex; flex-direction: column;">
-            <h3 class="sicodis-subtitle">SGP</h3>
+          <mat-card class="card-container border-top-sgp" style="height: 90%; display: flex; flex-direction: column;" role="region" aria-labelledby="titulo-card-sgp">
+            <h3 id="titulo-card-sgp" class="sicodis-subtitle">
+              <span class="badge badge-sgp" style="margin-right: 0.5rem;">SGP</span>
+              Sistema General de Participaciones
+            </h3>
             <!-- <p-table [value]="sgpItems" 
                      [tableStyle]="{ 'min-width': '100%' }"
                      styleClass="home-sgp-table">
@@ -159,31 +230,42 @@
             </p-table>
 
 
-            <div style="text-align: center; padding-top: 1rem;padding-bottom: 1rem;">              
-              <button pButton type="button" 
-                      label="Más información" 
-                      class="p-button-primary" 
-                      (click)="redirectSGP()">
-              </button>              
+            <div style="text-align: center; padding-top: var(--sp-lg); padding-bottom: var(--sp-lg);">
+              <button pButton
+                      type="button"
+                      label="Más información"
+                      icon="pi pi-chart-line"
+                      class="p-button-primary"
+                      (click)="redirectSGP()"
+                      [style]="{'background-color': 'var(--sgp-primary)', 'border-color': 'var(--sgp-primary)'}"
+                      aria-label="Ver más información del Sistema General de Participaciones">
+              </button>
             </div>
             
             <!-- Gráfico donut de avance -->
-            <div style="padding: 1rem; text-align: center;">
+            <div style="padding: var(--sp-lg); text-align: center;" role="img" aria-label="Gráfico circular de avance de ejecución del SGP">
               <div style="position: relative; height: 200px; margin: 0 auto;">
-                <p-chart type="doughnut" 
-                         [data]="donutSgpData" 
-                         [options]="donutSgpOptions" 
+                <p-chart type="doughnut"
+                         [data]="donutSgpData"
+                         [options]="donutSgpOptions"
                          [style]="{'height': '200px'}"
-                         *ngIf="donutSgpData">
+                         *ngIf="donutSgpData"
+                         ariaLabel="Gráfico de avance de ejecución mostrando distribución versus presupuesto">
                 </p-chart>
               </div>
-            </div>            
-            
+              <p style="font-size: var(--fs-xs); color: var(--gs); margin-top: var(--sp-sm);">
+                Avance de distribución frente al presupuesto total
+              </p>
+            </div>
+
           </mat-card>
         </mat-grid-tile>
         <mat-grid-tile style="align-items: flex-start;">
-          <mat-card class="card-container" style="height: 80%; display: flex; flex-direction: column;">
-            <h3 class="sicodis-subtitle">SGR</h3>
+          <mat-card class="card-container border-top-sgr" style="height: 90%; display: flex; flex-direction: column;" role="region" aria-labelledby="titulo-card-sgr">
+            <h3 id="titulo-card-sgr" class="sicodis-subtitle">
+              <span class="badge badge-sgr" style="margin-right: 0.5rem;">SGR</span>
+              Sistema General de Regalías
+            </h3>
             <p-table [value]="sgrItems" 
                      [tableStyle]="{ 'min-width': '100%' }"
                      styleClass="home-sgr-table">
@@ -212,45 +294,60 @@
               </ng-template>
             </p-table>
             
-            <div style="text-align: center; padding-top: 1rem;padding-bottom: 1rem;">              
-              <button pButton type="button" 
-                      label="Detalle Inversión" 
+            <div style="text-align: center; padding-top: var(--sp-lg); padding-bottom: var(--sp-lg); display: flex; gap: var(--sp-md); justify-content: center; flex-wrap: wrap;">
+              <button pButton
+                      type="button"
+                      label="Detalle Inversión"
+                      icon="pi pi-money-bill"
                       class="p-button-primary"
-                      (click)="redirectSGRInversion()">
+                      (click)="redirectSGRInversion()"
+                      [style]="{'background-color': 'var(--sgr-primary)', 'border-color': 'var(--sgr-primary)'}"
+                      aria-label="Ver detalle de inversión del Sistema General de Regalías">
               </button>
-              <button pButton type="button" style="margin-left: 1rem;"
+              <button pButton
+                      type="button"
                       label="Detalle Administración"
+                      icon="pi pi-cog"
                       class="p-button-primary"
-                      (click)="redirectSGRFuncionamiento()">
+                      (click)="redirectSGRFuncionamiento()"
+                      [style]="{'background-color': 'var(--sgr-primary)', 'border-color': 'var(--sgr-primary)'}"
+                      aria-label="Ver detalle de administración del Sistema General de Regalías">
               </button>
-              
             </div>
             
             <!-- Gráficos donut SGR - Vertical -->
-            <div style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: var(--sp-md); padding: var(--sp-lg);">
               <!-- Gráfico corrientes (naranja) -->
-              <div style="text-align: center;">
+              <div style="text-align: center;" role="img" aria-label="Gráfico circular de recursos corrientes del SGR">
                 <div style="position: relative; height: 180px; margin: 0 auto;">
-                  <p-chart type="doughnut" 
-                           [data]="donutSgrCorrientesData" 
-                           [options]="donutSgrCorrientesOptions" 
+                  <p-chart type="doughnut"
+                           [data]="donutSgrCorrientesData"
+                           [options]="donutSgrCorrientesOptions"
                            [style]="{'height': '180px'}"
-                           *ngIf="donutSgrCorrientesData">
+                           *ngIf="donutSgrCorrientesData"
+                           ariaLabel="Distribución de recursos corrientes">
                   </p-chart>
                 </div>
+                <p style="font-size: var(--fs-xs); color: var(--gs); margin-top: var(--sp-sm);">
+                  Recursos corrientes
+                </p>
               </div>
-              
-              <!-- Gráfico otros (verde agua) -->
-              <!-- <div style="text-align: center;padding-top: 5.5rem;">
+
+              <!-- Gráfico no corrientes (verde) -->
+              <div style="text-align: center;" role="img" aria-label="Gráfico circular de otros recursos del SGR">
                 <div style="position: relative; height: 180px; margin: 0 auto;">
-                  <p-chart type="doughnut" 
-                           [data]="donutSgrOtrosData" 
-                           [options]="donutSgrOtrosOptions" 
+                  <p-chart type="doughnut"
+                           [data]="donutSgrOtrosData"
+                           [options]="donutSgrOtrosOptions"
                            [style]="{'height': '180px'}"
-                           *ngIf="donutSgrOtrosData">
+                           *ngIf="donutSgrOtrosData"
+                           ariaLabel="Distribución de otros recursos">
                   </p-chart>
                 </div>
-              </div> -->
+                <p style="font-size: var(--fs-xs); color: var(--gs); margin-top: var(--sp-sm);">
+                  Otros recursos
+                </p>
+              </div>
             </div>
           </mat-card>
         </mat-grid-tile>
@@ -278,24 +375,36 @@
     </section> <!-- /cifras -->
 
     <section aria-labelledby="titulo-interes">
-    <div class="reports">
-    <h2 id="titulo-interes" class="reports-title">Información de Interés</h2>
+      <div class="reports">
+        <h2 id="titulo-interes" class="reports-title">
+          <i class="pi pi-bookmark" aria-hidden="true" style="margin-right: var(--sp-sm);"></i>
+          Información de Interés
+        </h2>
 
-    <div class="grid-container" style="margin-bottom: 2.5rem;">
-      <mat-grid-list [cols]="cols" rowHeight="300px" gutterSize="16">
-        <mat-grid-tile *ngFor="let card of cards">
-          <a [href]="card.link" target="_blank" rel="noopener" class="link-wrapper">
-            <mat-card class="card-container">
-              <img mat-card-image [src]="card.imageUrl" [alt]="card.title + ' - Imagen ilustrativa'">
-              <p class="description">{{card.description}}</p>
-              <mat-card-header>
-                <h3 class="sicodis-title">{{card.title}}</h3>
-              </mat-card-header>                
-            </mat-card>
-          </a>
-        </mat-grid-tile>
-      </mat-grid-list>
-    </div>
+        <nav class="grid-container" style="margin-bottom: var(--sp-3xl);" aria-label="Recursos informativos">
+          <mat-grid-list [cols]="cols" rowHeight="300px" gutterSize="16">
+            <mat-grid-tile *ngFor="let card of cards; let i = index">
+              <a [href]="card.link"
+                 target="_blank"
+                 rel="noopener"
+                 class="link-wrapper hover-lift"
+                 [attr.aria-label]="'Visitar: ' + card.title">
+                <mat-card class="card-container animate-fade-in-up" [style]="{'animation-delay': (i * 100) + 'ms'}">
+                  <img mat-card-image
+                       [src]="card.imageUrl"
+                       [alt]="card.title">
+                  <mat-card-header>
+                    <h3 class="sicodis-title">
+                      <i class="pi pi-external-link" aria-hidden="true" style="font-size: 0.9em; margin-right: var(--sp-xs);"></i>
+                      {{card.title}}
+                    </h3>
+                  </mat-card-header>
+                  <p class="description">{{card.description}}</p>
+                </mat-card>
+              </a>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </nav>
 
 
 
@@ -303,33 +412,39 @@
     </div> <!-- /reports interes -->
     </section> <!-- /interes -->
 
-    <div class="sicodis-questions" style="display:none;">
-      <img class="overlay-questions" src="/assets/img/overlay-questions.svg" alt="Imagen decorativa de preguntas frecuentes">
+    <section class="sicodis-questions" style="display:none;" aria-labelledby="titulo-preguntas">
+      <img class="overlay-questions" src="/assets/img/overlay-questions.svg" alt="" aria-hidden="true">
       <div>
-        <h2 class="title-questions">¿Tiene Preguntas acerca de SICODIS?</h2>
+        <h2 id="titulo-preguntas" class="title-questions">
+          <i class="pi pi-question-circle" aria-hidden="true" style="margin-right: var(--sp-sm);"></i>
+          ¿Tiene Preguntas acerca de SICODIS?
+        </h2>
       </div>
       <div>
         <p>
-          En SICODIS encontrará información detallada sobre la distribución de recursos asociada a diferentes recursos
+          En SICODIS encontrará información detallada sobre la distribución de recursos asociada a diferentes sistemas
         </p>
       </div>
-      <div style="padding-bottom: 1rem;">
-        <ul>
-          <li>
-            ¿Cómo encontrar un reporte?
-          </li>
-          <li>
-            ¿Cómo descargar un elemento?
-          </li>
-          <li>
-            No se preocupe, acá respondemos sus preguntas
-          </li>
+      <div style="padding-bottom: var(--sp-lg);">
+        <ul role="list">
+          <li>¿Cómo encontrar un reporte?</li>
+          <li>¿Cómo descargar un elemento?</li>
+          <li>¿Cómo interpretar los datos?</li>
+          <li>No se preocupe, acá respondemos sus preguntas</li>
         </ul>
       </div>
       <div>
-        <button pButton type="button" label="Ir a preguntas frecuentes" class="p-button-primary" (click)="redirectToFAQ()"></button>
+        <button pButton
+                type="button"
+                label="Ir a preguntas frecuentes"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                class="p-button-primary"
+                (click)="redirectToFAQ()"
+                aria-label="Ir a la página de preguntas frecuentes">
+        </button>
       </div>
-    </div>
+    </section>
    
 
     <!-- ================= MODAL VIDEO BIENVENIDA ================= -->
@@ -383,12 +498,15 @@
   </ng-template>
 
   <div style="text-align: center;">
-    <a href="https://www.dnp.gov.co/LaEntidad_/subdireccion-general-inversiones-seguimiento-evaluacion/direccion-programacion-inversiones-publicas/Paginas/sistema-general-de-regalias.aspx" target="_blank"
-       style="cursor: pointer; display: block;">
+    <a href="https://www.dnp.gov.co/LaEntidad_/subdireccion-general-inversiones-seguimiento-evaluacion/direccion-programacion-inversiones-publicas/Paginas/sistema-general-de-regalias.aspx"
+       target="_blank"
+       rel="noopener noreferrer"
+       style="cursor: pointer; display: block;"
+       aria-label="Ver boletín informativo del Sistema General de Regalías en el sitio del DNP (abre en nueva ventana)">
       <img
         src="/assets/img/alertasboletin.jpg"
-        alt="Boletín informativo del Sistema General de Regalías — haga clic para ver el documento completo en el sitio del DNP"
-        style="width: 100%; height: auto; display: block;"
+        alt="Boletín informativo del Sistema General de Regalías"
+        style="width: 100%; height: auto; display: block; border-radius: var(--rs);"
         title="Clic para ver el boletín en el sitio del DNP"
       />
     </a>

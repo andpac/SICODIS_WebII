@@ -218,9 +218,9 @@ export class HomeComponent implements OnInit {
   //   }
   // ];
 
-  titleSGR = 'Sistema General de Regalías - SGR';
-  titleSGP = 'Sistema General de Participaciones - SGP';
-  titlePGN = 'Presupuesto General de la Nación - PGN';
+  titleSGR = 'Sistema General de Regalías';
+  titleSGP = 'Sistema General de Participaciones';
+  titlePGN = 'Presupuesto General de la Nación';
   titleGeovisor = 'Geovisor';
 
   descriptionSGP =
@@ -552,7 +552,7 @@ sgpItems = [
       }
     };
 
-    // Opciones para gráfico otros (verde agua)
+    // Opciones para gráfico no corrientes (verde)
     this.donutSgrOtrosOptions = {
       cutout: '60%',
       rotation: -90,
@@ -570,9 +570,12 @@ sgpItems = [
         },
         title: {
           display: true,
-          text: 'Avance de distribución otros',
+          text: 'Avance de distribución no corrientes',
           color: "#333",
           font: { size: 18, weight: 'bold' }
+        },
+        datalabels: {
+          display: false
         },
         tooltip: {
           callbacks: {
@@ -620,21 +623,21 @@ sgpItems = [
       ]
     };
 
-    // Datos de ejemplo para otros (verde agua)
+    // Datos de ejemplo para no corrientes (verde)
     const otrosDistribuido = 285000000;
     const otrosTotal = 500000000;
     const otrosRestante = otrosTotal - otrosDistribuido;
     const otrosPorcentaje = (otrosDistribuido / otrosTotal) * 100;
-    
+
     this.sgrPorcentajeOtros = otrosPorcentaje.toFixed(1).replace('.', ',');
-    
+
     this.donutSgrOtrosData = {
       labels: ['Distribución', 'Presupuesto'],
       datasets: [
         {
           data: [otrosDistribuido, otrosRestante],
-          backgroundColor: ['#77d6ba', '#eceae9'],
-          hoverBackgroundColor: ['#5bc4a7', '#dee2e6'],
+          backgroundColor: ['#28a745', '#eceae9'],
+          hoverBackgroundColor: ['#218838', '#dee2e6'],
           borderColor: '#CCCCCC',
           borderWidth: 1,
         }

@@ -49,17 +49,116 @@ body {
   --app-heading-weight: 600;
   --app-body-weight: 400;
 
-  /* Dimensiones */
-  --input-height: 40px;           /* Altura reducida para inputs */
-  --input-padding: 0.5rem 0.75rem; /* Padding reducido */
-  --border-radius: 4px;           /* Radio de borde más pequeño */
-  --font-size: 14px;              /* Tamaño de fuente base */
-  --spacing-unit: 0.5rem;         /* Unidad de espaciado base */
+  /* ============================================
+     PALETA DE COLORES SICODIS
+     ============================================ */
+
+  /* Colores principales - Sistemas */
+  --t: #00c3c1;    /* Turquesa – innovación y apertura (SGP) */
+  --m: #fe1b7b;    /* Magenta – inclusión y transformación (SGR) */
+  --a: #ffca00;    /* Amarillo – desarrollo y esperanza (PGN) */
+
+  /* Colores de apoyo */
+  --gc: #ebebeb;   /* Gris claro – neutralidad */
+  --fw: #f5f2e9;   /* Fondo warm */
+  --bl: #ffffff;   /* Blanco */
+  --gt: #3d3d3d;   /* Gris texto principal */
+  --gm: #5e5e5e;   /* Gris texto medio */
+  --gs: #9b9b9b;   /* Gris texto suave */
+  --nr: #fbb03b;   /* Naranja secundario */
+  --mo: #7f47dd;   /* Morado secundario */
+
+  /* Colores institucionales (legado) */
+  --azul-dnp: #004583;        /* Azul institucional DNP */
+  --azul-sicodis: #0943b5;    /* Azul SICODIS */
+  --azul-hover: #2797ce;      /* Azul hover */
+
+  /* ============================================
+     VARIABLES SEMÁNTICAS POR SISTEMA
+     ============================================ */
+
+  /* Sistema General de Participaciones (SGP) */
+  --sgp-primary: var(--t);
+  --sgp-primary-light: rgba(0, 195, 193, 0.1);
+  --sgp-primary-hover: #00ada9;
+  --sgp-gradient: linear-gradient(135deg, var(--t) 0%, #00a8a6 100%);
+
+  /* Sistema General de Regalías (SGR) */
+  --sgr-primary: var(--m);
+  --sgr-primary-light: rgba(254, 27, 123, 0.1);
+  --sgr-primary-hover: #e01567;
+  --sgr-gradient: linear-gradient(135deg, var(--m) 0%, #e0176f 100%);
+
+  /* Presupuesto General de la Nación (PGN) */
+  --pgn-primary: var(--a);
+  --pgn-primary-light: rgba(255, 202, 0, 0.15);
+  --pgn-primary-hover: #e6b800;
+  --pgn-gradient: linear-gradient(135deg, var(--a) 0%, #f5c300 100%);
+
+  /* ============================================
+     SISTEMA DE DISEÑO
+     ============================================ */
+
+  /* Radios de borde */
+  --r: 12px;       /* Radio principal */
+  --rs: 8px;       /* Radio pequeño */
+  --rl: 16px;      /* Radio largo */
+
+  /* Sombras */
+  --sh: 0 2px 14px rgba(0, 0, 0, 0.07);              /* Sombra principal */
+  --sh-sm: 0 1px 4px rgba(0, 0, 0, 0.05);            /* Sombra pequeña */
+  --sh-md: 0 4px 16px rgba(0, 0, 0, 0.1);            /* Sombra media */
+  --sh-lg: 0 8px 24px rgba(0, 0, 0, 0.12);           /* Sombra grande */
+  --sh-hover: 0 6px 20px rgba(0, 0, 0, 0.15);        /* Sombra en hover */
+
+  /* Espaciado (sistema de 8px) */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-2xl: 48px;
+  --sp-3xl: 64px;
+
+  /* Tipografía */
+  --fs-xs: 0.75rem;      /* 12px */
+  --fs-sm: 0.875rem;     /* 14px */
+  --fs-base: 1rem;       /* 16px */
+  --fs-lg: 1.125rem;     /* 18px */
+  --fs-xl: 1.25rem;      /* 20px */
+  --fs-2xl: 1.5rem;      /* 24px */
+  --fs-3xl: 2rem;        /* 32px */
+  --fs-4xl: 2.5rem;      /* 40px */
+
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+
+  /* Line heights */
+  --lh-tight: 1.2;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.6;
+
+  /* Transiciones */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================
+     DIMENSIONES (legado - mantener compatibilidad)
+     ============================================ */
+  --input-height: 40px;
+  --input-padding: 0.5rem 0.75rem;
+  --border-radius: 4px;
+  --font-size: 14px;
+  --spacing-unit: 0.5rem;
   --select-fixed-width: 240px;
   --select-content-width: 200px;
-  --select-expanded-width: 360px;      /* Ancho máximo del panel desplegable */
-  --select-spacing: 16px;              /* Espaciado entre elementos */
-  --select-height: 40px;               /* Altura del select */
+  --select-expanded-width: 360px;
+  --select-spacing: 16px;
+  --select-height: 40px;
 }
 
 // Aplicar la fuente a los elementos de Angular Material
@@ -366,5 +465,260 @@ html, body {
   .container.scrolled {
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* ============================================
+   CLASES DE UTILIDAD - SISTEMA DE DISEÑO SICODIS
+   ============================================ */
+
+/* Colores de fondo por sistema */
+.bg-sgp { background-color: var(--sgp-primary); }
+.bg-sgp-light { background-color: var(--sgp-primary-light); }
+.bg-sgr { background-color: var(--sgr-primary); }
+.bg-sgr-light { background-color: var(--sgr-primary-light); }
+.bg-pgn { background-color: var(--pgn-primary); }
+.bg-pgn-light { background-color: var(--pgn-primary-light); }
+.bg-warm { background-color: var(--fw); }
+.bg-neutral { background-color: var(--gc); }
+
+/* Colores de texto por sistema */
+.text-sgp { color: var(--sgp-primary); }
+.text-sgr { color: var(--sgr-primary); }
+.text-pgn { color: var(--pgn-primary); }
+.text-primary { color: var(--gt); }
+.text-secondary { color: var(--gm); }
+.text-muted { color: var(--gs); }
+.text-dnp { color: var(--azul-dnp); }
+
+/* Badges/Tags con colores de sistema */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sp-xs) var(--sp-md);
+  border-radius: 24px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+
+.badge-sgp {
+  background-color: var(--sgp-primary);
+  color: white;
+}
+
+.badge-sgr {
+  background-color: var(--sgr-primary);
+  color: white;
+}
+
+.badge-pgn {
+  background-color: var(--pgn-primary);
+  color: var(--gt);
+}
+
+.badge-outline-sgp {
+  background-color: transparent;
+  border: 2px solid var(--sgp-primary);
+  color: var(--sgp-primary);
+}
+
+.badge-outline-sgr {
+  background-color: transparent;
+  border: 2px solid var(--sgr-primary);
+  color: var(--sgr-primary);
+}
+
+.badge-outline-pgn {
+  background-color: transparent;
+  border: 2px solid var(--pgn-primary);
+  color: var(--pgn-primary);
+}
+
+/* Bordes de acento por sistema */
+.border-top-sgp { border-top: 4px solid var(--sgp-primary); }
+.border-top-sgr { border-top: 4px solid var(--sgr-primary); }
+.border-top-pgn { border-top: 4px solid var(--pgn-primary); }
+
+.border-left-sgp { border-left: 4px solid var(--sgp-primary); }
+.border-left-sgr { border-left: 4px solid var(--sgr-primary); }
+.border-left-pgn { border-left: 4px solid var(--pgn-primary); }
+
+/* Sombras */
+.shadow-sm { box-shadow: var(--sh-sm); }
+.shadow { box-shadow: var(--sh); }
+.shadow-md { box-shadow: var(--sh-md); }
+.shadow-lg { box-shadow: var(--sh-lg); }
+.shadow-hover { box-shadow: var(--sh-hover); }
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s var(--transition-base) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s var(--transition-base) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s var(--transition-base) both;
+}
+
+/* Delays para animaciones escalonadas */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Transiciones suaves */
+.transition-all { transition: all var(--transition-base); }
+.transition-fast { transition: all var(--transition-fast); }
+.transition-slow { transition: all var(--transition-slow); }
+
+/* Hover elevación para cards */
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-hover);
+}
+
+/* Iconos circulares con color de fondo */
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  transition: transform var(--transition-base);
+}
+
+.icon-circle-sgp { background-color: var(--sgp-primary-light); }
+.icon-circle-sgr { background-color: var(--sgr-primary-light); }
+.icon-circle-pgn { background-color: var(--pgn-primary-light); }
+
+.icon-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Divider con color de sistema */
+.divider-sgp {
+  border-top: 2px solid var(--sgp-primary);
+  opacity: 0.2;
+}
+
+.divider-sgr {
+  border-top: 2px solid var(--sgr-primary);
+  opacity: 0.2;
+}
+
+.divider-pgn {
+  border-top: 2px solid var(--pgn-primary);
+  opacity: 0.2;
+}
+
+/* KPI Cards */
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  padding: var(--sp-lg);
+  border-radius: var(--r);
+  background: white;
+  box-shadow: var(--sh);
+  transition: all var(--transition-base);
+}
+
+.kpi-card:hover {
+  box-shadow: var(--sh-hover);
+  transform: translateY(-2px);
+}
+
+.kpi-label {
+  font-size: var(--fs-sm);
+  color: var(--gm);
+  font-weight: var(--fw-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-value {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-extrabold);
+  color: var(--gt);
+  line-height: var(--lh-tight);
+}
+
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  padding: var(--sp-xs) var(--sp-md);
+  border-radius: 24px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  width: fit-content;
+}
+
+/* Gradientes de fondo */
+.gradient-sgp {
+  background: var(--sgp-gradient);
+  color: white;
+}
+
+.gradient-sgr {
+  background: var(--sgr-gradient);
+  color: white;
+}
+
+.gradient-pgn {
+  background: var(--pgn-gradient);
+  color: var(--gt);
+}
+
+/* Utilidades de spacing responsive */
+@media (max-width: 768px) {
+  .kpi-value {
+    font-size: var(--fs-2xl);
+  }
+
+  .icon-circle {
+    width: 3rem;
+    height: 3rem;
   }
 }
