@@ -87,7 +87,7 @@ Página principal con:
 
 ## Elementos Comunes de la Interfaz
 
-![Elementos de interfaz comunes](./assets/elementos-comunes.png)
+![Elementos de interfaz comunes](./assets/general/elementos-comunes.png)
 *Placeholder: Captura mostrando header, breadcrumbs, footer*
 
 ### Header (Encabezado)
