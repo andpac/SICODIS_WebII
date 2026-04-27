@@ -29,7 +29,13 @@
       "Bash(tasklist:*)",
       "Bash(cmd //c \"taskkill /PID 30260 /F\")",
       "Bash(cmd //c \"taskkill /PID 62440 /F\")",
-      "Bash(cmd //c \"npm start\")"
+      "Bash(cmd //c \"npm start\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"build-pdf.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; & '.\\\\build-pdf.ps1' }\")",
+      "Bash(pwsh --version)",
+      "Bash(python3 -c ':*)",
+      "Bash(mmdc --version)",
+      "Bash(node build.js)"
     ]
   }
 }
