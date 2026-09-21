@@ -116,7 +116,13 @@
   <!-- Charts section - Solo visible cuando se seleccionan todos los filtros -->
    <div class="graphics-section" *ngIf="selectedMunicipio && selectedMunicipio2">
     <h2 class="charts-main-title">Avance del recaudo frente al Presupuesto Bienio  {{selectedBienio.label}}</h2>
-    <div class="dual-chart-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%;">
+
+    <!-- Indicador de carga mientras se consulta el comparativo -->
+    <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; padding: 4rem 0;">
+      <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4" ariaLabel="Cargando datos comparativos"></p-progressSpinner>
+    </div>
+
+    <div class="dual-chart-container" *ngIf="!isLoading" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%;">
       <!-- First Chart - Municipality 1 -->
       <div class="chart-column">
         <p-card class="chart-card">
@@ -154,7 +160,7 @@
             </div>
 
             <!-- Second donut chart -->
-            <div class="donut-chart-item">
+            <div class="donut-chart-item" *ngIf="municipio1SegundoDonutTitle">
               <h4 class="donut-chart-title">Presupuesto y recaudo corrientes {{ municipio1SegundoDonutTitle }}</h4>
               <div class="donut-chart-wrapper">
                 <p-chart
@@ -209,7 +215,7 @@
             </div>
 
             <!-- Second donut chart -->
-            <div class="donut-chart-item">
+            <div class="donut-chart-item" *ngIf="municipio2SegundoDonutTitle">
               <h4 class="donut-chart-title">Presupuesto y recaudo corrientes {{ municipio2SegundoDonutTitle }}</h4>
               <div class="donut-chart-wrapper">
                 <p-chart
@@ -230,7 +236,7 @@
     </div>
 
     <!-- Table View Toggle Buttons -->
-    <div class="table-view-toggle" style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+    <div class="table-view-toggle" *ngIf="!isLoading" style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
       <button pButton type="button"
               [class]="!showConsolidatedTable ? 'p-button-primary' : 'p-button-outlined'"
               label="Tablas Individuales"
@@ -254,7 +260,7 @@
     </div>
 
     <!-- Individual Municipality Tables for Presupuesto y Recaudo -->
-    <div class="municipality-tables-section" *ngIf="!showConsolidatedTable">
+    <div class="municipality-tables-section" *ngIf="!showConsolidatedTable && !isLoading">
       <div class="tables-container" style="overflow-x: auto;">
         <!-- Table for Municipality 1 -->
         <div class="municipality-table-wrapper">
@@ -395,7 +401,7 @@
     </div>
 
     <!-- Consolidated Table View -->
-    <div class="consolidated-table-section" *ngIf="showConsolidatedTable">
+    <div class="consolidated-table-section" *ngIf="showConsolidatedTable && !isLoading">
       <div class="consolidated-table-wrapper">
         <div class="table-header">
           <h3 class="consolidated-table-title">Comparativo Consolidado: {{ getSelectedMunicipalityName(1) }} vs {{ getSelectedMunicipalityName(2) }}</h3>

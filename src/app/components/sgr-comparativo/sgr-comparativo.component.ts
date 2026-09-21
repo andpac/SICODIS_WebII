@@ -15,6 +15,7 @@ import { Breadcrumb } from 'primeng/breadcrumb';
 import { MenuItem, TreeNode } from 'primeng/api';
 import { organizeCategoryData } from '../../utils/hierarchicalDataStructureV2';
 import { TooltipModule } from 'primeng/tooltip';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-sgr-comparativo',
@@ -32,7 +33,8 @@ import { TooltipModule } from 'primeng/tooltip';
     InfoPopupComponent,
     NumberFormatPipe,
     Breadcrumb,
-    TooltipModule
+    TooltipModule,
+    ProgressSpinner
   ],
   templateUrl: './sgr-comparativo.component.html',
   styleUrl: './sgr-comparativo.component.scss'
@@ -136,6 +138,23 @@ export class SgrComparativoComponent implements OnInit {
 
   // Table view toggle
   showConsolidatedTable: boolean = false;
+
+  // Indicador de carga mientras se consulta el comparativo (mejora la percepción
+  // de "el filtro se demora" en bienios anteriores, cuyo endpoint es más lento).
+  isLoading: boolean = false;
+
+  // Paleta de colores para las barras de "fuentes" cuando se construye la gráfica
+  // de forma genérica (bienios anteriores a 2017, con categorías distintas). El
+  // orden respeta el aspecto de los bienios nuevos: naranja (A. Directas), verde
+  // (Inversión), morado (FAE), magenta (FONPET) y colores adicionales de reserva.
+  private readonly paletaFuentes = [
+    { presColor: '#f38135ff', presBorder: '#be480eff', recColor: '#edb87cff', recBorder: '#8c5516' },
+    { presColor: '#2f9e6f', presBorder: '#1c6647', recColor: '#8ed6bd', recBorder: '#4f9c81' },
+    { presColor: '#6d28d9', presBorder: '#4c1d95', recColor: '#c4b5fd', recBorder: '#7c3aed' },
+    { presColor: '#f33aafff', presBorder: '#b11049ff', recColor: '#7991e8ff', recBorder: '#3d4d7a' },
+    { presColor: '#0ea5e9', presBorder: '#0369a1', recColor: '#7dd3fc', recBorder: '#0284c7' },
+    { presColor: '#eab308', presBorder: '#a16207', recColor: '#fde047', recBorder: '#ca8a04' }
+  ];
 
   constructor(private sicodisApiService: SicodisApiService) { }
 
@@ -536,6 +555,12 @@ export class SgrComparativoComponent implements OnInit {
       codigoEntidad2
     });
 
+    // Limpiar la visualización previa antes de consultar. Evita que queden datos
+    // obsoletos en pantalla cuando la nueva entidad/bienio no puede renderizarse
+    // (causa reportada de "no se actualizan los datos").
+    this.resetVisualizations();
+    this.isLoading = true;
+
     this.sicodisApiService.getSgrResumenPtoRecaudoComparador(
       idVigencia,
       tipoConsulta1,
@@ -546,11 +571,35 @@ export class SgrComparativoComponent implements OnInit {
       next: (data) => {
         console.log('Datos comparativos recibidos:', data);
         this.processComparativeData(data);
+        // Si la vista consolidada está activa, reconstruirla con los datos nuevos.
+        if (this.showConsolidatedTable) {
+          this.buildConsolidatedTable();
+          this.updateConsolidatedHeaders();
+        }
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error cargando datos comparativos:', error);
+        this.isLoading = false;
       }
     });
+  }
+
+  /**
+   * Restablece las gráficas y tablas de ambas entidades a un estado vacío. Se
+   * invoca antes de cada consulta para que nunca queden datos obsoletos cuando la
+   * nueva selección no produce resultados o falla la petición.
+   */
+  private resetVisualizations(): void {
+    this.planBienalMunicipio1ChartData = {};
+    this.planBienalMunicipio2ChartData = {};
+    this.planBienalMunicipio1DirectasDonutData = {};
+    this.planBienalMunicipio1LocalDonutData = {};
+    this.planBienalMunicipio2DirectasDonutData = {};
+    this.planBienalMunicipio2LocalDonutData = {};
+    this.municipality1TableData = [];
+    this.municipality2TableData = [];
+    this.consolidatedTableData = [];
   }
 
   /**
@@ -623,6 +672,16 @@ export class SgrComparativoComponent implements OnInit {
    * Procesar datos de una entidad
    */
   private processEntityData(entityData: SgrPtoRecaudoItem[], entityNumber: number): void {
+    // La tabla usa una estructura genérica (organizeCategoryData) y sirve para
+    // cualquier bienio, incluidos los anteriores a la reforma de 2017. Se construye
+    // siempre, con independencia de que las gráficas puedan renderizarse o no.
+    const tableData = this.buildTableData(entityData);
+    if (entityNumber === 1) {
+      this.municipality1TableData = tableData;
+    } else {
+      this.municipality2TableData = tableData;
+    }
+
     const asignacionesDirectas = entityData.find(item =>
       item.categoria === '1.1'
     );
@@ -669,15 +728,15 @@ export class SgrComparativoComponent implements OnInit {
       !!entidadSeleccionada?.codigo?.endsWith('000') &&
       !!entidadSeleccionada?.nombre?.startsWith('Gobernación de ');
 
-    // Para gobernaciones no se exige "A. Directas anticipadas" (1.1.3).
-    if (!asignacionesDirectas || !directas20 || (!directasAnticipadas && !esGobernacion) || !ahorro) {
-      console.warn(`Datos incompletos para entidad ${entityNumber}`, {
-        asignacionesDirectas: !!asignacionesDirectas,
-        directas20: !!directas20,
-        directasAnticipadas: !!directasAnticipadas,
-        esGobernacion,
-        ahorro: !!ahorro
-      });
+    // Los bienios anteriores a la reforma de 2017 tienen una estructura de
+    // categorías distinta (no existen los desgloses 1.1.1 / 1.1.3 ni las
+    // asignaciones para inversión local/regional). Cuando la estructura post-2017
+    // no está completa se construyen las gráficas de forma genérica a partir de
+    // las fuentes realmente disponibles, en lugar de dejar la vista en blanco.
+    const estructuraNuevaCompleta =
+      !!asignacionesDirectas && !!directas20 && (!!directasAnticipadas || esGobernacion) && !!ahorro;
+    if (!estructuraNuevaCompleta) {
+      this.buildGenericEntityCharts(entityData, entityNumber);
       return;
     }
 
@@ -771,7 +830,68 @@ export class SgrComparativoComponent implements OnInit {
       datasets: chartDatasets
     };
 
-    const chartOptions = {
+    const chartOptions = this.buildBarChartOptions();
+
+    if (entityNumber === 1) {
+      this.planBienalMunicipio1ChartData = chartData;
+      this.planBienalMunicipio1ChartOptions = chartOptions;
+
+      this.planBienalMunicipio1DirectasDonutData = {
+        labels: ['Presupuesto', 'Recaudo'],
+        datasets: [{
+          data: [asignacionesDirectas.presupuesto_corriente, asignacionesDirectas.caja_corriente_informada],
+          backgroundColor: ['#f33aafff', '#7991e8ff'],
+          borderColor: ['#b11049ff', '#3d4d7a'],
+          borderWidth: 1
+        }]
+      };
+
+      this.planBienalMunicipio1LocalDonutData = {
+        labels: ['Presupuesto', 'Recaudo'],
+        datasets: [{
+          data: [segundoDonutItem?.presupuesto_corriente ?? null, segundoDonutItem?.caja_corriente_informada ?? null],
+          backgroundColor: ['#f38135ff', '#edb87cff'],
+          borderColor: ['#be480eff', '#8c5516'],
+          borderWidth: 1
+        }]
+      };
+      this.municipio1PrimerDonutTitle = primerDonutTitle;
+      this.municipio1SegundoDonutTitle = segundoDonutTitle;
+    } else {
+      this.planBienalMunicipio2ChartData = chartData;
+      this.planBienalMunicipio2ChartOptions = chartOptions;
+
+      this.planBienalMunicipio2DirectasDonutData = {
+        labels: ['Presupuesto', 'Recaudo'],
+        datasets: [{
+          data: [asignacionesDirectas.presupuesto_corriente, asignacionesDirectas.caja_corriente_informada],
+          backgroundColor: ['#f33aafff', '#7991e8ff'],
+          borderColor: ['#b11049ff', '#3d4d7a'],
+          borderWidth: 1
+        }]
+      };
+
+      this.planBienalMunicipio2LocalDonutData = {
+        labels: ['Presupuesto', 'Recaudo'],
+        datasets: [{
+          data: [segundoDonutItem?.presupuesto_corriente ?? null, segundoDonutItem?.caja_corriente_informada ?? null],
+          backgroundColor: ['#f38135ff', '#edb87cff'],
+          borderColor: ['#be480eff', '#8c5516'],
+          borderWidth: 1
+        }]
+      };
+      this.municipio2PrimerDonutTitle = primerDonutTitle;
+      this.municipio2SegundoDonutTitle = segundoDonutTitle;
+    }
+  }
+
+  /**
+   * Opciones de la gráfica de barras horizontal (Presupuesto vs Recaudo por
+   * fuente). Compartidas por la ruta post-2017 y la ruta genérica de bienios
+   * anteriores para mantener un aspecto idéntico.
+   */
+  private buildBarChartOptions(): any {
+    return {
       responsive: true,
       maintainAspectRatio: false,
       indexAxis: 'y',
@@ -826,61 +946,112 @@ export class SgrComparativoComponent implements OnInit {
         }
       }
     };
+  }
+
+  /**
+   * Acorta los conceptos largos del API a las etiquetas usadas en la UF
+   * ("Asignaciones Directas" → "A. Directas", "Asignación para la Inversión ..."
+   * → "A. para la Inversión ..."). El resto de conceptos (FCR 40%, FONPET, etc.)
+   * se conservan tal cual.
+   */
+  private acortarConcepto(concepto: string | undefined): string {
+    return (concepto || '')
+      .trim()
+      .replace(/^Asignaciones\s+Directas/i, 'A. Directas')
+      .replace(/^Asignación\s+para\s+la\s+Inversión/i, 'A. para la Inversión');
+  }
+
+  /**
+   * Construye la gráfica de barras y las donas de "Detalle inversión ingresos
+   * corrientes" de forma genérica, a partir de las fuentes realmente presentes en
+   * los datos (categorías de un solo nivel de detalle: "1.1", "1.15", "2.2", ...).
+   * Se usa para los bienios anteriores a 2017, cuya estructura de categorías no
+   * coincide con la codificada para los bienios recientes.
+   */
+  private buildGenericEntityCharts(entityData: SgrPtoRecaudoItem[], entityNumber: number): void {
+    // Fuentes: categorías con exactamente un punto bajo INVERSIÓN (1.x) o AHORRO
+    // (2.x): "1.1", "1.15", "2.1", "2.2". Se excluyen los agregados sin punto
+    // ("1", "2"), los totales ("-2", "-1"), los sub-desgloses de dos puntos
+    // ("1.1.1") y la ADMINISTRACIÓN (3.x, p. ej. Funcionamiento), en línea con la
+    // ruta curada de los bienios recientes, que tampoco grafica esos rubros.
+    const fuentes = entityData.filter(item => /^[12]\.\d+$/.test((item.categoria || '').trim()));
+
+    const gruposBarras = fuentes.map((item, idx) => {
+      const color = this.paletaFuentes[idx % this.paletaFuentes.length];
+      return { label: this.acortarConcepto(item.concepto), item, ...color };
+    });
+
+    const totalGrupos = gruposBarras.length;
+    const chartLabels = gruposBarras.map(g => g.label);
+    const chartDatasets: any[] = [];
+    gruposBarras.forEach((grupo, indice) => {
+      const dataPresupuesto = new Array(totalGrupos).fill(null);
+      const dataRecaudo = new Array(totalGrupos).fill(null);
+      dataPresupuesto[indice] = grupo.item ? grupo.item.presupuesto_total_vigente : null;
+      dataRecaudo[indice] = grupo.item ? grupo.item.caja_total : null;
+
+      chartDatasets.push({
+        label: `Presupuesto - ${grupo.label}`,
+        data: dataPresupuesto,
+        backgroundColor: grupo.presColor,
+        borderColor: grupo.presBorder,
+        borderWidth: 1
+      });
+      chartDatasets.push({
+        label: `Recaudo - ${grupo.label}`,
+        data: dataRecaudo,
+        backgroundColor: grupo.recColor,
+        borderColor: grupo.recBorder,
+        borderWidth: 1
+      });
+    });
+
+    const chartData = { labels: chartLabels, datasets: chartDatasets };
+    const chartOptions = this.buildBarChartOptions();
+
+    // Donas de "Detalle inversión ingresos corrientes": las dos primeras fuentes
+    // de INVERSIÓN (categorías que empiezan por "1.").
+    const fuentesInversion = fuentes.filter(item => (item.categoria || '').trim().startsWith('1.'));
+    const donut1 = fuentesInversion[0];
+    const donut2 = fuentesInversion[1];
+
+    const donut1Data = donut1 ? {
+      labels: ['Presupuesto', 'Recaudo'],
+      datasets: [{
+        data: [donut1.presupuesto_corriente, donut1.caja_corriente_informada],
+        backgroundColor: ['#f33aafff', '#7991e8ff'],
+        borderColor: ['#b11049ff', '#3d4d7a'],
+        borderWidth: 1
+      }]
+    } : {};
+
+    const donut2Data = donut2 ? {
+      labels: ['Presupuesto', 'Recaudo'],
+      datasets: [{
+        data: [donut2.presupuesto_corriente, donut2.caja_corriente_informada],
+        backgroundColor: ['#f38135ff', '#edb87cff'],
+        borderColor: ['#be480eff', '#8c5516'],
+        borderWidth: 1
+      }]
+    } : {};
+
+    const donut1Title = donut1 ? this.acortarConcepto(donut1.concepto) : '';
+    const donut2Title = donut2 ? this.acortarConcepto(donut2.concepto) : '';
 
     if (entityNumber === 1) {
       this.planBienalMunicipio1ChartData = chartData;
       this.planBienalMunicipio1ChartOptions = chartOptions;
-
-      this.planBienalMunicipio1DirectasDonutData = {
-        labels: ['Presupuesto', 'Recaudo'],
-        datasets: [{
-          data: [asignacionesDirectas.presupuesto_corriente, asignacionesDirectas.caja_corriente_informada],
-          backgroundColor: ['#f33aafff', '#7991e8ff'],
-          borderColor: ['#b11049ff', '#3d4d7a'],
-          borderWidth: 1
-        }]
-      };
-
-      this.planBienalMunicipio1LocalDonutData = {
-        labels: ['Presupuesto', 'Recaudo'],
-        datasets: [{
-          data: [segundoDonutItem?.presupuesto_corriente ?? null, segundoDonutItem?.caja_corriente_informada ?? null],
-          backgroundColor: ['#f38135ff', '#edb87cff'],
-          borderColor: ['#be480eff', '#8c5516'],
-          borderWidth: 1
-        }]
-      };
-      this.municipio1PrimerDonutTitle = primerDonutTitle;
-      this.municipio1SegundoDonutTitle = segundoDonutTitle;
-
-      this.municipality1TableData = this.buildTableData(entityData);
+      this.planBienalMunicipio1DirectasDonutData = donut1Data;
+      this.planBienalMunicipio1LocalDonutData = donut2Data;
+      this.municipio1PrimerDonutTitle = donut1Title;
+      this.municipio1SegundoDonutTitle = donut2Title;
     } else {
       this.planBienalMunicipio2ChartData = chartData;
       this.planBienalMunicipio2ChartOptions = chartOptions;
-
-      this.planBienalMunicipio2DirectasDonutData = {
-        labels: ['Presupuesto', 'Recaudo'],
-        datasets: [{
-          data: [asignacionesDirectas.presupuesto_corriente, asignacionesDirectas.caja_corriente_informada],
-          backgroundColor: ['#f33aafff', '#7991e8ff'],
-          borderColor: ['#b11049ff', '#3d4d7a'],
-          borderWidth: 1
-        }]
-      };
-
-      this.planBienalMunicipio2LocalDonutData = {
-        labels: ['Presupuesto', 'Recaudo'],
-        datasets: [{
-          data: [segundoDonutItem?.presupuesto_corriente ?? null, segundoDonutItem?.caja_corriente_informada ?? null],
-          backgroundColor: ['#f38135ff', '#edb87cff'],
-          borderColor: ['#be480eff', '#8c5516'],
-          borderWidth: 1
-        }]
-      };
-      this.municipio2PrimerDonutTitle = primerDonutTitle;
-      this.municipio2SegundoDonutTitle = segundoDonutTitle;
-
-      this.municipality2TableData = this.buildTableData(entityData);
+      this.planBienalMunicipio2DirectasDonutData = donut1Data;
+      this.planBienalMunicipio2LocalDonutData = donut2Data;
+      this.municipio2PrimerDonutTitle = donut1Title;
+      this.municipio2SegundoDonutTitle = donut2Title;
     }
   }
 
