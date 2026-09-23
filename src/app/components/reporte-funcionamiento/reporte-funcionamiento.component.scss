@@ -462,6 +462,12 @@
     margin-right: auto;
     width: 100%;
     
+    // Separador entre registros para que cada bloque se lea como una unidad
+    .registro-item + .registro-item {
+      border-top: 1px solid var(--p-content-border-color, #dee2e6);
+      padding-top: 1rem;
+    }
+
     .detail-grid {
       display: flex;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -488,8 +494,8 @@
     }
 
     .detail-chart-container {
-      margin-top: .5rem;
-      margin-bottom: 0.5rem;
+      margin-top: .25rem;
+      margin-bottom: 1.25rem;
       width: 100%;
 
       .chart-section-title {
@@ -502,13 +508,15 @@
 
       .detail-chart {
         width: 100%;
-        height: 350px;
-        max-height: 350px;
+        height: 140px;
+        max-height: 140px;
       }
 
+      // El eje Y ya no lleva el nombre del beneficiario, por lo que la gráfica
+      // ocupa todo el ancho y todas las tarjetas comparten el mismo origen.
       &.detail-chart-aligned {
-        width: calc((100% / 6 * 4) + (1rem * 3));
-        margin-left: calc((100% / 6) + 1rem);
+        width: 100%;
+        margin-left: 0;
       }
     }
 

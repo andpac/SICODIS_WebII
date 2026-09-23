@@ -324,7 +324,7 @@
       </mat-card-header>
       <mat-card-content>
         <div style="display: table-row;width: 100%;;">
-          <div *ngFor="let registro of (selectedBeneficiario.length > 0 ? distribucionTotalMultiple : distribucionTotal); let i = index">
+          <div class="registro-item" *ngFor="let registro of (selectedBeneficiario.length > 0 ? distribucionTotalMultiple : distribucionTotal); let i = index">
             <div class="detail-grid">
               <div class="detail-item">
                 <strong>Asignación:</strong> {{registro.fuente_principal || 'N/A'}}

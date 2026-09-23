@@ -2125,7 +2125,9 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
       // Generar un chart data por cada registro
       this.detailChartData = datosParaGrafico.map((registro: any) => ({
-        labels: [this.envolverEtiqueta(registro.beneficiario_seleccionado || registro.fuente_principal || 'S/N')],
+        // El nombre del beneficiario ya se muestra en el detalle; se omite del eje Y
+        // para que todas las gráficas compartan el mismo origen horizontal.
+        labels: [''],
         datasets: [
           {
             label: 'Compromisos',
@@ -2393,9 +2395,39 @@ export class ReporteFuncionamientoComponent implements OnInit {
       }
     };
 
-    // Register the plugin globally
+    // Plugin para rotular el porcentaje de ejecución al final de la barra
+    // en las gráficas del detalle del registro seleccionado.
+    const barValueLabelsPlugin = {
+      id: 'barValueLabels',
+      afterDatasetsDraw: (chart: any) => {
+        if (!chart.config.options.plugins?.barValueLabels?.display) {
+          return;
+        }
+        const bar = chart.getDatasetMeta(0)?.data?.[0]; // dataset 0 = Compromisos
+        if (!bar) {
+          return;
+        }
+        const compromisos = Number(chart.data.datasets[0]?.data?.[0]) || 0;
+        const disponible = Number(chart.data.datasets[1]?.data?.[0]) || 0;
+        if (disponible <= 0) {
+          return;
+        }
+        const porcentaje = (compromisos / disponible * 100).toFixed(1).replace('.', ',');
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = 'bold 12px Arial';
+        ctx.fillStyle = '#303135';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(porcentaje + '%', bar.x + 8, bar.y);
+        ctx.restore();
+      }
+    };
+
+    // Register the plugins globally
     if (typeof Chart !== 'undefined') {
       Chart.register(centerTextPlugin);
+      Chart.register(barValueLabelsPlugin);
     }
 
     const documentStyle = getComputedStyle(document.documentElement);
@@ -2829,10 +2861,10 @@ export class ReporteFuncionamientoComponent implements OnInit {
       devicePixelRatio: window.devicePixelRatio || 2,
       layout: {
         padding: {
-          top: 10,
-          bottom: 10,
-          left: 10,
-          right: 10
+          top: 6,
+          bottom: 0,
+          left: 8,
+          right: 56
         }
       },
       plugins: {
@@ -2842,7 +2874,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
             color: textColor,
             font: { size: 11 },
             boxWidth: 20,
-            padding: 10
+            padding: 8
           }
         },
         title: {
@@ -2851,9 +2883,17 @@ export class ReporteFuncionamientoComponent implements OnInit {
         datalabels: {
           display: false
         },
+        barValueLabels: {
+          display: true
+        },
         tooltip: {          
           mode: 'index',          
           callbacks: {
+            // Sin título: la etiqueta del eje Y se eliminó porque el nombre del
+            // beneficiario ya aparece en el detalle del registro.
+            title: function() {
+              return [];
+            },
             label: function(tooltipItem: any) {
               const label = tooltipItem.dataset.label || '';
               const value = Math.ceil(tooltipItem.raw).toLocaleString('es-CO');
@@ -2881,11 +2921,12 @@ export class ReporteFuncionamientoComponent implements OnInit {
         y: {
           stacked: true,
           ticks: {
-            color: textColor,
-            font: { size: 11 }
+            display: false
+          },
+          border: {
+            display: false
           },
           grid: {
-            color: surfaceBorder,
             display: false
           }
         }
