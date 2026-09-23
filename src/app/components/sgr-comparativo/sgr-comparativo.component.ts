@@ -143,18 +143,37 @@ export class SgrComparativoComponent implements OnInit {
   // de "el filtro se demora" en bienios anteriores, cuyo endpoint es más lento).
   isLoading: boolean = false;
 
-  // Paleta de colores para las barras de "fuentes" cuando se construye la gráfica
-  // de forma genérica (bienios anteriores a 2017, con categorías distintas). El
-  // orden respeta el aspecto de los bienios nuevos: naranja (A. Directas), verde
-  // (Inversión), morado (FAE), magenta (FONPET) y colores adicionales de reserva.
-  private readonly paletaFuentes = [
-    { presColor: '#f38135ff', presBorder: '#be480eff', recColor: '#edb87cff', recBorder: '#8c5516' },
-    { presColor: '#2f9e6f', presBorder: '#1c6647', recColor: '#8ed6bd', recBorder: '#4f9c81' },
-    { presColor: '#6d28d9', presBorder: '#4c1d95', recColor: '#c4b5fd', recBorder: '#7c3aed' },
-    { presColor: '#f33aafff', presBorder: '#b11049ff', recColor: '#7991e8ff', recBorder: '#3d4d7a' },
-    { presColor: '#0ea5e9', presBorder: '#0369a1', recColor: '#7dd3fc', recBorder: '#0284c7' },
-    { presColor: '#eab308', presBorder: '#a16207', recColor: '#fde047', recBorder: '#ca8a04' }
-  ];
+  // Alto del contenedor de la gráfica de barras. Se calcula según el número de
+  // fuentes para que las barras conserven un grosor legible cuando el bienio
+  // tiene muchas categorías (p. ej. gobernaciones anteriores a 2017).
+  private static readonly ALTURA_CHART_MINIMA = 300;
+  private static readonly ALTURA_POR_FUENTE = 46;
+  private static readonly ALTURA_EJES_Y_LEYENDA = 80;
+
+  // Número de fuentes graficadas por entidad. Ambas tarjetas comparten un mismo
+  // alto (el mayor de las dos) para que las secciones que van debajo de la
+  // gráfica queden alineadas aunque una entidad tenga una fuente más que la otra
+  // (p. ej. una gobernación con FAE frente a un municipio sin FAE).
+  private municipio1Fuentes = 0;
+  private municipio2Fuentes = 0;
+
+  get chartHeight(): string {
+    const fuentes = Math.max(this.municipio1Fuentes, this.municipio2Fuentes);
+    const alto = Math.max(
+      SgrComparativoComponent.ALTURA_CHART_MINIMA,
+      fuentes * SgrComparativoComponent.ALTURA_POR_FUENTE +
+        SgrComparativoComponent.ALTURA_EJES_Y_LEYENDA
+    );
+    return `${alto}px`;
+  }
+
+  // Colores de las dos series de la gráfica de barras. El color codifica la
+  // medida (Presupuesto vs. Recaudo) y no la fuente: el nombre de la fuente ya
+  // está en el eje Y, así que la leyenda se reduce a dos entradas. El naranja y
+  // el azul son los mismos tonos que las donas de detalle usan para presupuesto
+  // y recaudo, y forman un par distinguible con daltonismo rojo-verde.
+  private readonly COLOR_PRESUPUESTO = { fondo: '#f38135', borde: '#be480e' };
+  private readonly COLOR_RECAUDO = { fondo: '#7991e8', borde: '#3d4d7a' };
 
   constructor(private sicodisApiService: SicodisApiService) { }
 
@@ -593,6 +612,8 @@ export class SgrComparativoComponent implements OnInit {
   private resetVisualizations(): void {
     this.planBienalMunicipio1ChartData = {};
     this.planBienalMunicipio2ChartData = {};
+    this.municipio1Fuentes = 0;
+    this.municipio2Fuentes = 0;
     this.planBienalMunicipio1DirectasDonutData = {};
     this.planBienalMunicipio1LocalDonutData = {};
     this.planBienalMunicipio2DirectasDonutData = {};
@@ -756,85 +777,31 @@ export class SgrComparativoComponent implements OnInit {
     // asignaciones directas de municipios).
     const primerDonutTitle = esGobernacion ? 'A. Directas' : 'A. Directas 25%';
 
-    // Grupos que conforman la gráfica de barras horizontal. Cada grupo aporta un par
-    // de barras (Presupuesto y Recaudo) con su propio color. El FAE (2.1) solo se
-    // incluye cuando la entidad lo recibe (gobernaciones). El ahorro se rotula
-    // únicamente como "FONPET" (sin el prefijo "Ahorro").
-    const gruposBarras: {
-      label: string;
-      item: SgrPtoRecaudoItem | undefined;
-      presColor: string;
-      presBorder: string;
-      recColor: string;
-      recBorder: string;
-    }[] = [
-      {
-        label: 'A. Directas',
-        item: asignacionesDirectas,
-        presColor: '#f38135ff', presBorder: '#be480eff',
-        recColor: '#edb87cff', recBorder: '#8c5516'
-      },
-      {
-        label: inversionLabel,
-        item: inversionItem,
-        presColor: '#2f9e6f', presBorder: '#1c6647',
-        recColor: '#8ed6bd', recBorder: '#4f9c81'
-      }
+    // Grupos que conforman la gráfica de barras horizontal. Cada grupo es una
+    // fuente y aporta una barra de Presupuesto y una de Recaudo. El FAE (2.1)
+    // solo se incluye cuando la entidad lo recibe (gobernaciones). El ahorro se
+    // rotula únicamente como "FONPET" (sin el prefijo "Ahorro").
+    const gruposBarras: { label: string; item: SgrPtoRecaudoItem | undefined }[] = [
+      { label: 'A. Directas', item: asignacionesDirectas },
+      { label: inversionLabel, item: inversionItem }
     ];
 
     // FAE (solo gobernaciones que lo reciben)
     if (fae) {
-      gruposBarras.push({
-        label: 'FAE',
-        item: fae,
-        presColor: '#6d28d9', presBorder: '#4c1d95',
-        recColor: '#c4b5fd', recBorder: '#7c3aed'
-      });
+      gruposBarras.push({ label: 'FAE', item: fae });
     }
 
     // FONPET (siempre presente)
-    gruposBarras.push({
-      label: 'FONPET',
-      item: ahorro,
-      presColor: '#f33aafff', presBorder: '#b11049ff',
-      recColor: '#7991e8ff', recBorder: '#3d4d7a'
-    });
+    gruposBarras.push({ label: 'FONPET', item: ahorro });
 
-    const totalGrupos = gruposBarras.length;
-    const chartLabels = gruposBarras.map(g => g.label);
-    const chartDatasets: any[] = [];
-    gruposBarras.forEach((grupo, indice) => {
-      const dataPresupuesto = new Array(totalGrupos).fill(null);
-      const dataRecaudo = new Array(totalGrupos).fill(null);
-      dataPresupuesto[indice] = grupo.item ? grupo.item.presupuesto_total_vigente : null;
-      dataRecaudo[indice] = grupo.item ? grupo.item.caja_total : null;
-
-      chartDatasets.push({
-        label: `Presupuesto - ${grupo.label}`,
-        data: dataPresupuesto,
-        backgroundColor: grupo.presColor,
-        borderColor: grupo.presBorder,
-        borderWidth: 1
-      });
-      chartDatasets.push({
-        label: `Recaudo - ${grupo.label}`,
-        data: dataRecaudo,
-        backgroundColor: grupo.recColor,
-        borderColor: grupo.recBorder,
-        borderWidth: 1
-      });
-    });
-
-    const chartData = {
-      labels: chartLabels,
-      datasets: chartDatasets
-    };
+    const chartData = this.buildBarChartData(gruposBarras);
 
     const chartOptions = this.buildBarChartOptions();
 
     if (entityNumber === 1) {
       this.planBienalMunicipio1ChartData = chartData;
       this.planBienalMunicipio1ChartOptions = chartOptions;
+      this.municipio1Fuentes = gruposBarras.length;
 
       this.planBienalMunicipio1DirectasDonutData = {
         labels: ['Presupuesto', 'Recaudo'],
@@ -860,6 +827,7 @@ export class SgrComparativoComponent implements OnInit {
     } else {
       this.planBienalMunicipio2ChartData = chartData;
       this.planBienalMunicipio2ChartOptions = chartOptions;
+      this.municipio2Fuentes = gruposBarras.length;
 
       this.planBienalMunicipio2DirectasDonutData = {
         labels: ['Presupuesto', 'Recaudo'],
@@ -883,6 +851,43 @@ export class SgrComparativoComponent implements OnInit {
       this.municipio2PrimerDonutTitle = primerDonutTitle;
       this.municipio2SegundoDonutTitle = segundoDonutTitle;
     }
+  }
+
+  /**
+   * Construye los datos de la gráfica de barras horizontal a partir de las
+   * fuentes de la entidad. Se emiten exactamente dos series —Presupuesto y
+   * Recaudo—, de modo que la leyenda tenga siempre dos entradas y cada barra
+   * ocupe la mitad de su banda, sin importar cuántas fuentes traiga el bienio.
+   *
+   * La alternativa previa (un par de datasets por fuente, con los demás valores
+   * en null) repartía cada banda entre 2N barras y generaba una leyenda de 2N
+   * entradas que duplicaba las etiquetas del eje Y; con las 8 fuentes de una
+   * gobernación anterior a 2017 la leyenda tapaba la gráfica.
+   *
+   * Compartida por la ruta post-2017 y la ruta genérica de bienios anteriores.
+   */
+  private buildBarChartData(grupos: { label: string; item: SgrPtoRecaudoItem | undefined }[]): any {
+    return {
+      labels: grupos.map(g => g.label),
+      datasets: [
+        {
+          label: 'Presupuesto',
+          data: grupos.map(g => g.item?.presupuesto_total_vigente ?? null),
+          backgroundColor: this.COLOR_PRESUPUESTO.fondo,
+          borderColor: this.COLOR_PRESUPUESTO.borde,
+          borderWidth: 1,
+          maxBarThickness: 22
+        },
+        {
+          label: 'Recaudo',
+          data: grupos.map(g => g.item?.caja_total ?? null),
+          backgroundColor: this.COLOR_RECAUDO.fondo,
+          borderColor: this.COLOR_RECAUDO.borde,
+          borderWidth: 1,
+          maxBarThickness: 22
+        }
+      ]
+    };
   }
 
   /**
@@ -976,37 +981,12 @@ export class SgrComparativoComponent implements OnInit {
     // ruta curada de los bienios recientes, que tampoco grafica esos rubros.
     const fuentes = entityData.filter(item => /^[12]\.\d+$/.test((item.categoria || '').trim()));
 
-    const gruposBarras = fuentes.map((item, idx) => {
-      const color = this.paletaFuentes[idx % this.paletaFuentes.length];
-      return { label: this.acortarConcepto(item.concepto), item, ...color };
-    });
+    const gruposBarras = fuentes.map(item => ({
+      label: this.acortarConcepto(item.concepto),
+      item
+    }));
 
-    const totalGrupos = gruposBarras.length;
-    const chartLabels = gruposBarras.map(g => g.label);
-    const chartDatasets: any[] = [];
-    gruposBarras.forEach((grupo, indice) => {
-      const dataPresupuesto = new Array(totalGrupos).fill(null);
-      const dataRecaudo = new Array(totalGrupos).fill(null);
-      dataPresupuesto[indice] = grupo.item ? grupo.item.presupuesto_total_vigente : null;
-      dataRecaudo[indice] = grupo.item ? grupo.item.caja_total : null;
-
-      chartDatasets.push({
-        label: `Presupuesto - ${grupo.label}`,
-        data: dataPresupuesto,
-        backgroundColor: grupo.presColor,
-        borderColor: grupo.presBorder,
-        borderWidth: 1
-      });
-      chartDatasets.push({
-        label: `Recaudo - ${grupo.label}`,
-        data: dataRecaudo,
-        backgroundColor: grupo.recColor,
-        borderColor: grupo.recBorder,
-        borderWidth: 1
-      });
-    });
-
-    const chartData = { labels: chartLabels, datasets: chartDatasets };
+    const chartData = this.buildBarChartData(gruposBarras);
     const chartOptions = this.buildBarChartOptions();
 
     // Donas de "Detalle inversión ingresos corrientes": las dos primeras fuentes
@@ -1041,6 +1021,7 @@ export class SgrComparativoComponent implements OnInit {
     if (entityNumber === 1) {
       this.planBienalMunicipio1ChartData = chartData;
       this.planBienalMunicipio1ChartOptions = chartOptions;
+      this.municipio1Fuentes = gruposBarras.length;
       this.planBienalMunicipio1DirectasDonutData = donut1Data;
       this.planBienalMunicipio1LocalDonutData = donut2Data;
       this.municipio1PrimerDonutTitle = donut1Title;
@@ -1048,6 +1029,7 @@ export class SgrComparativoComponent implements OnInit {
     } else {
       this.planBienalMunicipio2ChartData = chartData;
       this.planBienalMunicipio2ChartOptions = chartOptions;
+      this.municipio2Fuentes = gruposBarras.length;
       this.planBienalMunicipio2DirectasDonutData = donut1Data;
       this.planBienalMunicipio2LocalDonutData = donut2Data;
       this.municipio2PrimerDonutTitle = donut1Title;

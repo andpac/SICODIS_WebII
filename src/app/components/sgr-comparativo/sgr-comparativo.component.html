@@ -131,13 +131,15 @@
               <h3 class="chart-title">{{ getSelectedMunicipalityName(1) }} </h3>
             </div>
           </ng-template>          
-          <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
-            <p-chart 
-              type="bar" 
-              [data]="planBienalMunicipio1ChartData" 
+          <!-- El alto se calcula según el número de fuentes del bienio para que las
+               barras conserven un grosor legible (ver el getter chartHeight). -->
+          <div class="chart-container" style="position: relative; width: 100%;" [style.height]="chartHeight">
+            <p-chart
+              type="bar"
+              [data]="planBienalMunicipio1ChartData"
               [options]="planBienalMunicipio1ChartOptions"
-              width="570px"
-              height="300px">
+              width="100%"
+              [height]="chartHeight">
             </p-chart>
           </div>
           <!-- Detalle ingresos corrientes for Presupuesto y recaudo Municipality 1 -->
@@ -186,13 +188,13 @@
               <h3 class="chart-title">{{ getSelectedMunicipalityName(2) }}</h3>
             </div>
           </ng-template>          
-          <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
+          <div class="chart-container" style="position: relative; width: 100%;" [style.height]="chartHeight">
             <p-chart
             type="bar"
             [data]="planBienalMunicipio2ChartData"
             [options]="planBienalMunicipio2ChartOptions"
-            width="570px"
-            height="300px">
+            width="100%"
+            [height]="chartHeight">
           </p-chart>
           </div>
           <!-- Detalle ingresos corrientes for Plan Bienal Municipality 2 -->
