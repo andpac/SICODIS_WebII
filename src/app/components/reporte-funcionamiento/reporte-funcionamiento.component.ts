@@ -1,7 +1,7 @@
 ﻿import { Component, NgZone, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SicodisApiService } from '../../services/sicodis-api.service';
-import type { DiccionarioItem, SiglasItem, FuncionamientoSiglasDiccionario } from '../../services/sicodis-api.service';
+import type { DiccionarioItem, SiglasItem, FuncionamientoSiglasDiccionario, ConceptoFuente } from '../../services/sicodis-api.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -903,6 +903,20 @@ export class ReporteFuncionamientoComponent implements OnInit {
   }
 
   /**
+   * Obtiene los conceptos de las fuentes indicadas para la vigencia seleccionada.
+   * Se usa el endpoint por vigencia porque `conceptos_fuentes/{ids}` ignora el filtro de
+   * fuentes y devuelve todos los conceptos (p. ej. los de SSEC al elegir "Funcionamiento SGR").
+   * Además se filtra por `id_fuente` en el cliente como salvaguarda.
+   */
+  private async obtenerConceptosDeFuentes(idsFuentes: number[]): Promise<ConceptoFuente[]> {
+    const idsFuentesString = idsFuentes.join(',');
+    const conceptos = this.selectedVigencia?.id
+      ? await this.sicodisApiService.getConceptosFuentesVigencia(idsFuentesString, this.selectedVigencia.id).toPromise()
+      : await this.sicodisApiService.getConceptosFuentes(idsFuentesString).toPromise();
+    return (conceptos ?? []).filter(c => idsFuentes.includes(c.id_fuente));
+  }
+
+  /**
    * Cargar conceptos desde las fuentes seleccionadas usando API (optimizado)
    */
   private async cargarConceptosDesdeFuentes(): Promise<void> {
@@ -935,8 +949,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
       }
 
       // Llamar al API con los IDs de fuentes separados por comas
-      const idsFuentesString = idsFuentesSeleccionadas.join(',');
-      const conceptosFuentesApi = await this.sicodisApiService.getConceptosFuentes(idsFuentesString).toPromise();
+      const conceptosFuentesApi = await this.obtenerConceptosDeFuentes(idsFuentesSeleccionadas);
       const conceptosFuentes = this.filtrarConceptosSinDatos(conceptosFuentesApi);
 
       if (conceptosFuentes && conceptosFuentes.length > 0) {
@@ -953,11 +966,9 @@ export class ReporteFuncionamientoComponent implements OnInit {
         // Construir el mapa fuente → conceptos
         this.selectedFuente.forEach((fuenteSeleccionada: any) => {
           if (fuenteSeleccionada.value !== "TOTAL") {
-            const conceptosDeFuente = conceptosOrdenados.filter((concepto: any) => {
-              // Los conceptos vienen filtrados por las fuentes solicitadas, 
-              // pero necesitamos asociar cada concepto a su fuente específica
-              return true; // Por ahora, todos los conceptos aplican a todas las fuentes seleccionadas
-            });
+            const conceptosDeFuente = conceptosOrdenados.filter(
+              (concepto: any) => concepto.id_fuente === fuenteSeleccionada.value
+            );
             
             this.fuenteConceptoMap.set(fuenteSeleccionada.value.toString(), conceptosDeFuente.map(c => ({
               id: c.id_concepto,
@@ -1127,9 +1138,8 @@ export class ReporteFuncionamientoComponent implements OnInit {
       }
 
       // Obtener los conceptos con sus IDs
-      const idsFuentesString = idsFuentesSeleccionadas.join(',');
-      const conceptosFuentes = await this.sicodisApiService.getConceptosFuentes(idsFuentesString).toPromise();
-      
+      const conceptosFuentes = await this.obtenerConceptosDeFuentes(idsFuentesSeleccionadas);
+
       if (!conceptosFuentes || conceptosFuentes.length === 0) {
         this.usarBeneficiariosLocales();
         return;
