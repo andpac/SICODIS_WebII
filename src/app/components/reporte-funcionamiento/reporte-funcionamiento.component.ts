@@ -212,7 +212,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
    */
   get ocultarCajaYRecaudo(): boolean {
     return this.selectedBeneficiario?.length === 1 &&
-      (this.selectedBeneficiario[0]?.label ?? '').trim() === this.DNP_CR &&
+      (this.selectedBeneficiario[0]?.label ?? '').trim() === this.DNP_CR_LABEL &&
       this.selectedEntidadCR != null &&
       (this.selectedEntidadCR.nombre_entidad ?? '').trim() !== 'Comisión Rectora - DNP';
   }
@@ -240,6 +240,8 @@ export class ReporteFuncionamientoComponent implements OnInit {
   siglasContent: string = '';
 
   DNP_CR = 'Departamento Nacional de Planeación - Comisión Rectora';
+  /** Etiqueta con la que se muestra el beneficiario DNP_CR en el selector y el detalle. */
+  DNP_CR_LABEL = `${this.DNP_CR} - Bolsa`;
   DEPARTAMENTO = 'DEPARTAMENTO';
   MUNICIPIO = 'MUNICIPIO';
 
@@ -283,7 +285,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
       this.cargarEntidadesSiNecesario();
     } else if (this.selectedBeneficiario.length === 1 && 
       this.selectedVigencia == this.vigencias[0] && // Solo mostrar en última vigencia
-      this.selectedBeneficiario[0].label.trim() === this.DNP_CR) {
+      this.selectedBeneficiario[0].label.trim() === this.DNP_CR_LABEL) {
       this.showEntidadesCR = true;
       this.showDptos = false;
       this.showMpios = false;
@@ -1231,7 +1233,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
           { value: "0", label: "TOTAL" },
           ...beneficiariosOrdenados.map(([nombre, codigo]) => ({
             value: codigo,
-            label: nombre
+            label: this.etiquetaBeneficiario(nombre)
           }))
         ];
         this.selectedBeneficiario = [{ value: "0", label: "TOTAL" }];
@@ -1248,6 +1250,13 @@ export class ReporteFuncionamientoComponent implements OnInit {
       console.warn('Error cargando beneficiarios desde API, usando datos locales:', error);
       this.usarBeneficiariosLocales();
     }
+  }
+
+  /**
+   * Etiqueta visible de un beneficiario: al beneficiario DNP_CR se le agrega " - Bolsa".
+   */
+  private etiquetaBeneficiario(nombre: string): string {
+    return (nombre ?? '').trim() === this.DNP_CR ? this.DNP_CR_LABEL : nombre;
   }
 
   /**
@@ -1274,7 +1283,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
       { value: "0", label: "TOTAL" },
       ...beneficiariosUnicos.sort().map((beneficiario: any) => ({
         value: beneficiario, // En datos locales no tenemos ID, usar nombre
-        label: beneficiario
+        label: this.etiquetaBeneficiario(beneficiario)
       }))
     ];
     
@@ -1841,7 +1850,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
       params.idsBeneficiario = this.selectedDepartamento.value;
       
     } else if (this.selectedBeneficiario && this.selectedBeneficiario.length === 1 && 
-               this.selectedBeneficiario[0].label.trim() === this.DNP_CR &&
+               this.selectedBeneficiario[0].label.trim() === this.DNP_CR_LABEL &&
                this.selectedEntidadCR) {
       // Si beneficiario es DNP_CR y hay entidad CR seleccionada, usar ID de la entidad CR
       params.idsBeneficiario = this.selectedEntidadCR.codigo_entidad;
@@ -1895,7 +1904,7 @@ export class ReporteFuncionamientoComponent implements OnInit {
 
     // Si beneficiario es DNP CR y se seleccionó al menos una entidad CR
    if (this.selectedBeneficiario && this.selectedBeneficiario.length === 1 && 
-        this.selectedBeneficiario[0].label.trim() === this.DNP_CR &&
+        this.selectedBeneficiario[0].label.trim() === this.DNP_CR_LABEL &&
         this.selectedEntidadCR) {
       return "CR";
     }
