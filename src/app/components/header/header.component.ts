@@ -101,6 +101,10 @@ export class HeaderComponent implements OnDestroy {
             command: () => this.redirectUrl("sgp-eficiencias")
           },
           {
+            label: 'Ficha Municipal',
+            command: () => this.redirectUrl("sgp-ficha")
+          },          
+          {
             label: 'Proyecciones',
             command: () => this.downloadFile('https://colaboracion.dnp.gov.co/CDT/Inversiones%20y%20finanzas%20pblicas/Documentos%20GFT/Documentos_SGP/Ficha%20Proyecciones%20SGP%202026.xlsx')
           },

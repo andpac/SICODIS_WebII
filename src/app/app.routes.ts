@@ -14,6 +14,7 @@ import { SgpComparativaComponent } from './components/sgp-comparativa/sgp-compar
 import { PgnRegionalizacionPresupuestoProgramacionComponent } from './components/pgn-regionalizacion-presupuesto-programacion/pgn-regionalizacion-presupuesto-programacion.component';
 import { PgnComparativaRegionalizacionComponent } from './components/pgn-comparativa-regionalizacion/pgn-comparativa-regionalizacion.component';
 import { SgpEficienciasComponent } from './components/sgp-eficiencias/sgp-eficiencias.component';
+import { SgpFichaComponent } from './components/sgp-ficha/sgp-ficha.component';
 import { SgrRecaudoMensualComponent } from './components/sgr-recaudo-mensual/sgr-recaudo-mensual.component';
 import { SgrComparativoComponent } from './components/sgr-comparativo/sgr-comparativo.component';
 import { SgrProgramacionComponent } from './components/sgr-programacion/sgr-programacion.component';
@@ -72,6 +73,7 @@ export const routes: Routes = [
     { path: 'sgp-detalle-presupuestal',       component: SgpDetallePresupuestalComponent,                  data: { breadcrumb: 'SGP — Detalle Presupuestal' } },
     { path: 'sgp-comparativa',                component: SgpComparativaComponent,                          data: { breadcrumb: 'SGP — Comparativa' } },
     { path: 'sgp-eficiencias',                 component: SgpEficienciasComponent,                          data: { breadcrumb: 'SGP — Eficiencias' } },
+    { path: 'sgp-ficha',                       component: SgpFichaComponent,                                data: { breadcrumb: 'SGP — Ficha municipal' } },
     // PGN
     { path: 'pgn-inversion-por-sector',       component: PgnInversionPorSectorComponent,                   data: { breadcrumb: 'PGN — Inversión por Sector' } },
     { path: 'pgn-regionalizacion',            component: PgnRegionalizacionPresupuestoProgramacionComponent, data: { breadcrumb: 'PGN — Regionalización' } },

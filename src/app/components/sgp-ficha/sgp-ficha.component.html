@@ -1,0 +1,872 @@
+<div class="sgp-ficha-container">
+
+  <!-- Banner -->
+  <div class="gradient-banner">
+    <div class="gradient-overlay"></div>
+    <div class="banner-content">
+      <h1>Ficha Municipal SGP</h1>
+      <p>
+        Consulte por municipio los recursos asignados del Sistema General de Participaciones en la vigencia
+        actual frente a la anterior, su variación por participación y por criterio, y cómo se compara su
+        asignación per cápita con la de municipios similares.
+      </p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-panel">
+    <div class="filters-row">
+
+      <!-- Departamento -->
+      <div class="p-field departamento-select">
+        <p-floatlabel class="w-full" variant="on">
+          <p-select
+            id="departamento"
+            [options]="departments"
+            inputId="departamentoSelect"
+            [(ngModel)]="departmentSelected"
+            (onChange)="onDepartmentChange($event)"
+            optionLabel="label"
+            optionValue="id"
+            placeholder="Departamento"
+            [ngClass]="{ 'ng-invalid ng-dirty': departamentoInvalido }">
+          </p-select>
+          <label for="departamentoSelect">Departamento *</label>
+        </p-floatlabel>
+        <small class="field-error" *ngIf="departamentoInvalido">Seleccione un departamento</small>
+      </div>
+
+      <!-- Municipio -->
+      <div class="p-field municipio-select">
+        <p-floatlabel class="w-full" variant="on">
+          <p-select
+            id="municipio"
+            [options]="towns"
+            inputId="municipioSelect"
+            [(ngModel)]="townSelected"
+            (onChange)="onTownChange($event)"
+            optionLabel="label"
+            optionValue="id"
+            placeholder="Municipio"
+            [disabled]="!departmentSelected"
+            [ngClass]="{ 'ng-invalid ng-dirty': municipioInvalido }">
+          </p-select>
+          <label for="municipioSelect">Municipio *</label>
+        </p-floatlabel>
+        <small class="field-error" *ngIf="municipioInvalido">Seleccione un municipio</small>
+      </div>
+
+      <!-- Botones -->
+      <div class="buttons-group">
+        <p-button
+          label="Aplicar"
+          icon="pi pi-check"
+          (onClick)="onAplicar()"
+          [loading]="isLoading"
+          [rounded]="true"
+          severity="primary">
+        </p-button>
+
+        <p-button
+          label="Limpiar"
+          icon="pi pi-filter-slash"
+          (onClick)="clearFilters()"
+          [rounded]="true"
+          severity="secondary">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fecha de consulta y descarga de la ficha -->
+  <div class="dates-buttons-container">
+    <div style="width: 84%;">
+      <p class="date-update">Fecha de consulta: {{ fechaActual }}</p>
+    </div>
+    <div class="descarga-ficha">
+      <p-button
+        [label]="exportando ? 'Procesando...' : 'Descargar Ficha'"
+        icon="pi pi-download"
+        severity="success"
+        [loading]="exportando"
+        [disabled]="!ficha || isLoading"
+        (onClick)="descargarFicha()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Mensaje de error al consultar -->
+  <div class="ficha-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <!-- Contenido de la ficha -->
+  <div class="cards-section" *ngIf="ficha">
+
+    <!-- SECCIÓN 1 Encabezado del municipio -->
+    <div class="efficiency-card ficha-encabezado" *ngIf="datosGenerales as dg">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">location_city</mat-icon>
+            <mat-card-title>{{ dg.nombreMunicipio }}, {{ dg.nombreDepto }}</mat-card-title>
+            <span class="card-subtitle">Código DANE {{ dg.codigoDane }}</span>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="kpis">
+
+            <!-- Población -->
+            <div class="kpi">
+              <h3>Población</h3>
+              <div class="pair">
+                <div class="val prev">
+                  <small>{{ dg.anioAnterior }}</small>
+                  <b>{{ formatNumero(dg.poblacionAnterior) }}</b>
+                  <span>habitantes</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="val">
+                  <small>{{ dg.anioActual }}</small>
+                  <b>{{ formatNumero(dg.poblacionActual) }}</b>
+                  <span>habitantes</span>
+                </div>
+              </div>
+              <div class="variacion" [ngClass]="claseVariacion(dg.variacionPoblacion)">
+                <span class="lbl">Variación</span>
+                <span class="ico">{{ flechaVariacion(dg.variacionPoblacion) }}</span>
+                <b>{{ formatVariacion(dg.variacionPoblacion) }}</b>
+                <span class="txt">{{ textoDiferenciaPoblacion }}<br>que en {{ dg.anioAnterior }}</span>
+              </div>
+            </div>
+
+            <!-- Pobreza NBI -->
+            <div class="kpi nbi">
+              <h3>Pobreza NBI</h3>
+              <b class="nbi-valor">{{ formatNumero(dg.nbiActual, 1) }}%</b>
+              <div class="meter"><i [style.width.%]="nbiAncho"></i></div>
+              <span class="nbi-texto">Necesidades Básicas Insatisfechas</span>
+            </div>
+
+            <!-- Recursos SGP -->
+            <div class="kpi recursos" *ngIf="recursoTotal as total" [ngClass]="claseVariacion(total.variacion)">
+              <h3>Recursos SGP</h3>
+              <div class="pair">
+                <div class="val prev">
+                  <small>{{ dg.anioAnterior }}</small>
+                  <b>${{ formatNumero(total.valorAnterior) }}</b>
+                  <span>millones de pesos</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="val">
+                  <small>{{ dg.anioActual }}</small>
+                  <b>${{ formatNumero(total.valorActual) }}</b>
+                  <span>millones de pesos</span>
+                </div>
+              </div>
+              <div class="variacion" [ngClass]="claseVariacion(total.variacion)">
+                <span class="lbl">Variación</span>
+                <span class="ico">{{ flechaVariacion(total.variacion) }}</span>
+                <b>{{ formatVariacion(total.variacion) }}</b>
+                <span class="txt">{{ textoDiferenciaRecursos }}<br>que en {{ dg.anioAnterior }}</span>
+              </div>
+            </div>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 2 Datos generales sobre la asignación -->
+    <div class="efficiency-card ficha-seccion" *ngIf="datosGenerales as dg">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">insights</mat-icon>
+            <mat-card-title>Datos generales sobre la asignación</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('datosGenerales')"
+                    [attr.aria-label]="seccionesAbiertas['datosGenerales'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['datosGenerales'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['datosGenerales'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['datosGenerales']">
+          <div class="grafica-variacion">
+            <div class="grafica-titulo">Variación del SGP (millones de pesos)</div>
+
+            <div class="fila" *ngFor="let f of filasVariacion" [class.total]="f.esTotal">
+              <div class="etiqueta">{{ f.etiqueta }}</div>
+
+              <div class="barra" *ngIf="!f.sinRecursos">
+                <div class="segmento anterior" [style.width.%]="f.anchoAnterior" [class.angosto]="f.anchoAnterior < 8">
+                  <span>${{ formatNumero(f.anterior) }}</span>
+                </div>
+                <div class="segmento actual" [style.width.%]="f.anchoActual" [class.angosto]="f.anchoActual < 8">
+                  <span>${{ formatNumero(f.actual) }}</span>
+                </div>
+              </div>
+              <div class="barra vacia" *ngIf="f.sinRecursos"><span>$0</span></div>
+
+              <div class="var" [ngClass]="claseVariacion(f.variacion)">
+                <ng-container *ngIf="f.variacion !== null">
+                  <mat-icon>{{ iconoVariacion(f.variacion) }}</mat-icon>
+                  <span>{{ formatPorcentaje(f.variacion) }}</span>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="leyenda">
+              <span><i class="cuadro anterior"></i>{{ dg.anioAnterior }}</span>
+              <span><i class="cuadro actual"></i>{{ dg.anioActual }}</span>
+            </div>
+
+            <p class="nota">Hasta la fecha no se ha distribuido la totalidad de los recursos de educación y del FONPET</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 3 Educación -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-educacion" *ngIf="ficha.educacion as edu">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">school</mat-icon>
+            <mat-card-title>Participación para Educación</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('educacion')"
+                    [attr.aria-label]="seccionesAbiertas['educacion'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['educacion'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['educacion'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['educacion']">
+          <div class="concepto-graficas">
+            <ng-container *ngTemplateOutlet="tplCriterios; context: { criterios: edu.criterios, titulo: 'Participación para Educación' }"></ng-container>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: edu.comparativo }"></ng-container>
+          </div>
+
+          <!-- ¿Qué determinó la asignación? -->
+          <div class="que-determino">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+
+            <div class="bloques" *ngIf="edu.indicadores as ind">
+
+              <!-- Prestación de Servicios -->
+              <div class="bloque" *ngIf="criterio(edu.criterios, 1) as c">
+                <h4>Prestación de Servicios</h4>
+                <div class="linea">
+                  <mat-icon>school</mat-icon>
+                  <p>La variación de los recursos es <span class="dato">{{ textoVariacionCriterio(c) }}</span></p>
+                </div>
+                <div class="linea">
+                  <mat-icon>verified</mat-icon>
+                  <p *ngIf="!ind['certificado']">Municipio no certificado en educación</p>
+                  <p *ngIf="ind['certificado']">
+                    Municipio certificado en educación. La matrícula atendida asciende a
+                    {{ formatNumero(ind['matriculaPrestacionActual']) }} frente a la del año anterior que fue de
+                    {{ formatNumero(ind['matriculaPrestacionAnterior']) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Calidad Gratuidad Educativa -->
+              <div class="bloque" *ngIf="criterio(edu.criterios, 2) as c">
+                <h4>Calidad Gratuidad Educativa</h4>
+                <div class="linea">
+                  <mat-icon>account_balance</mat-icon>
+                  <p>La variación de los recursos es <span class="dato">{{ textoVariacionCriterio(c) }}</span></p>
+                </div>
+                <div class="linea">
+                  <mat-icon>face</mat-icon>
+                  <p>
+                    La matrícula de gratuidad educativa asciende a {{ formatNumero(ind['gratuidadOficialActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['gratuidadOficialAnterior']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>schedule</mat-icon>
+                  <p>
+                    La matrícula en jornada única asciende a {{ formatNumero(ind['gratuidadJornadaUnicaActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['gratuidadJornadaUnicaAnterior']) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Calidad Matrícula Oficial -->
+              <div class="bloque" *ngIf="criterio(edu.criterios, 3) as c">
+                <h4>Calidad Matrícula Oficial</h4>
+                <div class="linea">
+                  <mat-icon>groups</mat-icon>
+                  <p>La variación de los recursos es <span class="dato">{{ textoVariacionCriterio(c) }}</span></p>
+                </div>
+                <div class="linea">
+                  <mat-icon>apartment</mat-icon>
+                  <p>
+                    La matrícula oficial asciende a {{ formatNumero(ind['matriculaOficialActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['matriculaOficialAnterior']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>how_to_reg</mat-icon>
+                  <p>
+                    La matrícula reconocida asciende a {{ formatNumero(ind['matriculaReconocidaActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['matriculaReconocidaAnterior']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>palette</mat-icon>
+                  <p>
+                    La matrícula indígena asciende a {{ formatNumero(ind['matriculaIndigenaActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['matriculaIndigenaAnterior']) }}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+    <!-- SECCIÓN 4 Salud -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-salud" *ngIf="ficha.salud as sal">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">local_hospital</mat-icon>
+            <mat-card-title>Participación para Salud</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('salud')"
+                    [attr.aria-label]="seccionesAbiertas['salud'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['salud'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['salud'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['salud']">
+
+          <!-- Tres gráficas con su variación debajo -->
+          <div class="salud-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplAnios; context: { criterio: criterio(sal.criterios.regimenSubsidiado, 1), titulo: 'Régimen Subsidiado' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionCriterio(criterio(sal.criterios.regimenSubsidiado, 1)) }}</span></p>
+            </div>
+            <div>
+              <ng-container *ngTemplateOutlet="tplCriterios; context: { criterios: sal.criterios.saludPublica, titulo: 'Salud Pública' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionCriterio(criterio(sal.criterios.saludPublica, 8)) }}</span></p>
+            </div>
+            <div>
+              <ng-container *ngTemplateOutlet="tplAnios; context: { criterio: criterio(sal.criterios.subsidioOferta, 1), titulo: 'Subsidio a la Oferta' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionCriterio(criterio(sal.criterios.subsidioOferta, 1)) }}</span></p>
+            </div>
+          </div>
+
+          <!-- ¿Qué determinó la asignación? -->
+          <div class="que-determino">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+
+            <div class="bloques salud-bloques" *ngIf="sal.indicadores as ind">
+
+              <!-- Régimen Subsidiado -->
+              <div class="bloque">
+                <h4>Régimen Subsidiado</h4>
+                <div class="linea">
+                  <mat-icon>badge</mat-icon>
+                  <p>
+                    La variación de la población afiliada al régimen subsidiado es de
+                    {{ formatPorcentaje(ind['variacionPoblacionRS']) }}, pasando de
+                    {{ formatNumero(ind['poblacionRSAnterior']) }} en {{ datosGenerales?.anioAnterior }} a
+                    {{ formatNumero(ind['poblacionRSActual']) }} en {{ datosGenerales?.anioActual }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Salud Pública -->
+              <div class="bloque" *ngIf="datosGenerales as dg">
+                <h4>Salud Pública</h4>
+                <div class="linea">
+                  <mat-icon>groups</mat-icon>
+                  <p>
+                    La variación de la población DANE es {{ formatPorcentaje(dg.variacionPoblacion) }}, pasando de
+                    {{ formatNumero(dg.poblacionAnterior) }} en {{ dg.anioAnterior }} a {{ formatNumero(dg.poblacionActual) }}
+                    en {{ dg.anioActual }} y de la población Malaria {{ formatPorcentaje(ind['variacionPoblacionMalaria']) }},
+                    pasando de {{ formatNumero(ind['poblacionMalariaAnterior']) }} en {{ dg.anioAnterior }} a
+                    {{ formatNumero(ind['poblacionMalariaActual']) }} en {{ dg.anioActual }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>agriculture</mat-icon>
+                  <p>
+                    El índice de ruralidad en {{ dg.anioActual }} es {{ formatPorcentaje(ind['ruralidadActual']) }}
+                    frente al de {{ dg.anioAnterior }} que fue de {{ formatPorcentaje(ind['ruralidadAnterior']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>location_city</mat-icon>
+                  <p>
+                    La densidad poblacional en {{ dg.anioActual }} es de {{ formatPorcentaje(ind['densidadActual'], 2) }}
+                    frente a {{ dg.anioAnterior }} que fue de {{ formatPorcentaje(ind['densidadAnterior'], 2) }}.
+                    Tener en cuenta que los beneficiarios de estos recursos son aquellos por encima del promedio nacional,
+                    que en {{ dg.anioActual }} es {{ formatPorcentaje(ind['densidadPromedioNalActual'], 2) }} y en
+                    {{ dg.anioAnterior }} fue {{ formatPorcentaje(ind['densidadPromedioNalAnterior'], 2) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>vaccines</mat-icon>
+                  <p>
+                    La cobertura de vacunación en {{ dg.anioActual }} es de {{ formatPorcentaje(ind['vacunacionActual']) }}
+                    frente a {{ dg.anioAnterior }} que fue de {{ formatPorcentaje(ind['vacunacionAnterior']) }}.
+                    La meta establecida por el MSPS para ser beneficiario es de {{ formatPorcentaje(ind['metaVacunacion']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>request_quote</mat-icon>
+                  <p>
+                    El porcentaje de recursos comprometidos en {{ dg.anioActual }} es de {{ formatPorcentaje(ind['cuipoActual']) }}
+                    frente a {{ dg.anioAnterior }} que fue de {{ formatPorcentaje(ind['cuipoAnterior']) }}.
+                    La meta establecida por el MSPS para ser beneficiario es de {{ formatPorcentaje(ind['metaCuipo']) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Subsidio a la Oferta -->
+              <div class="bloque">
+                <h4>Subsidio a la Oferta</h4>
+                <div class="linea">
+                  <mat-icon>local_hospital</mat-icon>
+                  <p>{{ textoMonopolioSalud(ind) }}</p>
+                </div>
+                <div class="linea">
+                  <mat-icon>verified</mat-icon>
+                  <p>{{ textoCertificadoSalud(ind) }}</p>
+                </div>
+                <div class="linea">
+                  <mat-icon>rule</mat-icon>
+                  <p>Aplica las mismas variables de salud pública, población DANE, pobreza, ruralidad y densidad poblacional</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Per cápita de Salud frente a los promedios -->
+          <div class="salud-percapita">
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: sal.comparativo }"></ng-container>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+    <!-- SECCIÓN 5 Agua Potable y Saneamiento Básico -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-agua" *ngIf="ficha.agua as agu">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">water_drop</mat-icon>
+            <mat-card-title>Participación para Agua Potable y Saneamiento Básico</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('agua')"
+                    [attr.aria-label]="seccionesAbiertas['agua'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['agua'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['agua'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['agua']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplCriterios; context: { criterios: agu.criterios, titulo: 'Participación para Agua' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('AGUA') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: agu.comparativo }"></ng-container>
+          </div>
+
+          <!-- ¿Qué determinó la asignación? -->
+          <div class="que-determino">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+
+            <div class="bloques una-columna" *ngIf="agu.indicadores as ind">
+              <div class="bloque lineas-en-columnas" *ngIf="datosGenerales as dg">
+                <div class="linea">
+                  <mat-icon>groups</mat-icon>
+                  <p>
+                    La variación de la población es de {{ formatPorcentaje(dg.variacionPoblacion) }}, pasando de
+                    {{ formatNumero(dg.poblacionAnterior) }} en {{ dg.anioAnterior }} a
+                    {{ formatNumero(dg.poblacionActual) }} en {{ dg.anioActual }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>diversity_3</mat-icon>
+                  <p>
+                    La variación de la población balance del esquema solidario es de
+                    {{ formatPorcentaje(ind['variacionPoblacionBalance']) }}, pasando de
+                    {{ formatNumero(ind['poblacionBalanceAnterior']) }} en {{ dg.anioAnterior }} a
+                    {{ formatNumero(ind['poblacionBalanceActual']) }} en {{ dg.anioActual }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>speed</mat-icon>
+                  <p>
+                    El indicador de eficiencia es {{ formatPorcentaje(ind['eficienciaActual']) }}
+                    mientras que el año anterior fue de {{ formatPorcentaje(ind['eficienciaAnterior']) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+    <!-- SECCIÓN 6 Propósito General -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-proposito" *ngIf="ficha.proposito as pg">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">account_balance</mat-icon>
+            <mat-card-title>Participación para Propósito General</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('proposito')"
+                    [attr.aria-label]="seccionesAbiertas['proposito'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['proposito'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['proposito'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['proposito']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplCriterios; context: { criterios: pg.criterios, titulo: 'Participación para Propósito General' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('PROPOSITO') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: pg.comparativo }"></ng-container>
+          </div>
+
+          <div class="que-determino">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+            <div class="bloques una-columna">
+              <div class="bloque lineas-en-columnas">
+                <div class="linea">
+                  <mat-icon>groups</mat-icon>
+                  <p>{{ textoPoblacionPG(pg.indicadores) }}</p>
+                </div>
+                <div class="linea">
+                  <mat-icon>receipt_long</mat-icon>
+                  <p>{{ textoEficienciaFiscal(pg.indicadores) }}</p>
+                </div>
+                <div class="linea">
+                  <mat-icon>fact_check</mat-icon>
+                  <p>{{ textoEficienciaAdministrativa(pg.indicadores) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 7 Alimentación Escolar -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-alimentacion" *ngIf="ficha.alimentacion as pae">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">restaurant</mat-icon>
+            <mat-card-title>Programa de Alimentación Escolar</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('alimentacion')"
+                    [attr.aria-label]="seccionesAbiertas['alimentacion'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['alimentacion'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['alimentacion'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['alimentacion']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplCriterios; context: { criterios: pae.criterios, titulo: 'Programa de Alimentación Escolar' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('ALIMENTACION') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: pae.comparativo }"></ng-container>
+          </div>
+
+          <div class="que-determino">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+            <div class="bloques una-columna" *ngIf="pae.indicadores as ind">
+              <div class="bloque lineas-en-columnas">
+                <div class="linea">
+                  <mat-icon>school</mat-icon>
+                  <p>
+                    La matrícula oficial asciende a {{ formatNumero(ind['matriculaActual']) }}
+                    frente a la del año anterior que fue de {{ formatNumero(ind['matriculaAnterior']) }}
+                  </p>
+                </div>
+                <div class="linea">
+                  <mat-icon>restaurant</mat-icon>
+                  <p>{{ textoEficienciaPAE(ind) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 8 Ribereños del río Magdalena -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-riberenos" *ngIf="ficha.riberenos as rib">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">sailing</mat-icon>
+            <mat-card-title>Ribereños del río Magdalena</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('riberenos')"
+                    [attr.aria-label]="seccionesAbiertas['riberenos'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['riberenos'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['riberenos'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['riberenos']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplAnios; context: { criterio: recurso('RIBERENOS'), titulo: 'Ribereños del río Magdalena' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('RIBERENOS') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: rib.comparativo }"></ng-container>
+          </div>
+
+          <div class="que-determino" *ngIf="rib.indicadores as ind">
+            <div class="banda">¿Qué determinó la asignación de recursos?</div>
+            <div class="bloques una-columna">
+              <div class="bloque lineas-en-columnas">
+                <div class="linea">
+                  <mat-icon>sailing</mat-icon>
+                  <p *ngIf="(ind['kmRioMagdalena'] ?? 0) > 0">
+                    El municipio tiene {{ formatNumero(ind['kmRioMagdalena'], 2) }} km² de ribera sobre el río Magdalena
+                  </p>
+                  <p *ngIf="(ind['kmRioMagdalena'] ?? 0) <= 0">
+                    El municipio no tiene ribera sobre el río Magdalena, por lo cual no recibe recursos por esta asignación
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 9 Resguardos Indígenas -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-resguardos" *ngIf="ficha.resguardos as res">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">diversity_3</mat-icon>
+            <mat-card-title>Resguardos Indígenas</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('resguardos')"
+                    [attr.aria-label]="seccionesAbiertas['resguardos'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['resguardos'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['resguardos'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['resguardos']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplAnios; context: { criterio: recurso('RESGUARDOS'), titulo: 'Resguardos Indígenas' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('RESGUARDOS') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: res.comparativo }"></ng-container>
+          </div>
+
+          <!-- Igual que en el Excel, el texto solo aparece si el municipio recibe recursos de resguardos -->
+          <div class="que-determino" *ngIf="res.indicadores as ind">
+            <ng-container *ngIf="(recurso('RESGUARDOS')?.valorActual ?? 0) > 0">
+              <div class="banda">¿Qué determinó la asignación de recursos?</div>
+              <div class="bloques una-columna">
+                <div class="bloque lineas-en-columnas">
+                  <div class="linea">
+                    <mat-icon>diversity_3</mat-icon>
+                    <p>
+                      La variación de la población en resguardos indígenas es de
+                      {{ formatPorcentaje(ind['variacionPoblacionResguardo']) }}, pasando de
+                      {{ formatNumero(ind['poblacionResguardoAnterior']) }} en {{ datosGenerales?.anioAnterior }} a
+                      {{ formatNumero(ind['poblacionResguardoActual']) }} en {{ datosGenerales?.anioActual }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SECCIÓN 10 FONPET -->
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-fonpet" *ngIf="ficha.fonpet as fon">
+      <mat-card>
+        <mat-card-header>
+          <div class="card-header-content">
+            <mat-icon class="card-icon fiscal-icon">savings</mat-icon>
+            <mat-card-title>FONPET 2,9%</mat-card-title>
+            <button type="button" class="toggle-btn"
+                    (click)="toggleSeccion('fonpet')"
+                    [attr.aria-label]="seccionesAbiertas['fonpet'] ? 'Contraer' : 'Expandir'"
+                    [title]="seccionesAbiertas['fonpet'] ? 'Contraer' : 'Expandir'">
+              <mat-icon>{{ seccionesAbiertas['fonpet'] ? 'remove' : 'add' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="seccionesAbiertas['fonpet']">
+          <div class="concepto-graficas">
+            <div>
+              <ng-container *ngTemplateOutlet="tplAnios; context: { criterio: recurso('FONPET'), titulo: 'FONPET 2,9%' }"></ng-container>
+              <p class="variacion-criterio">La variación de los recursos en {{ datosGenerales?.anioActual }} es
+                <span class="dato">{{ textoVariacionRecurso('FONPET') }}</span></p>
+            </div>
+            <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: fon.comparativo }"></ng-container>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Notas aclaratorias -->
+    <div class="notas-aclaratorias">
+      <strong>Notas aclaratorias</strong>
+      <ol>
+        <li>La información relacionada con el promedio departamental corresponde al promedio de la asignación per cápita
+          calculada para el concepto consultado. Por ejemplo, si se consulta la participación de Propósito General para un
+          municipio del departamento de Cundinamarca, este indicador mostrará el promedio per cápita de los recursos asignados
+          por dicho concepto a los municipios del departamento de Cundinamarca.</li>
+        <li>La información relacionada con el promedio por población corresponde al promedio de la asignación per cápita
+          calculada para el concepto consultado, considerando aquellos municipios cuya población se encuentre dentro de un
+          rango del 10% por encima y del 10% por debajo de la población del municipio consultado. Por ejemplo, si se consulta
+          la participación de Propósito General para el municipio de Abejorral (Antioquia), cuya población certificada para la
+          vigencia 2026 es de 21.126 habitantes, este indicador mostrará el promedio per cápita de los recursos asignados por
+          dicho concepto a los municipios con poblaciones comprendidas entre 19.013 y 23.239 habitantes.</li>
+        <li>La información relacionada con el promedio por NBI corresponde al promedio de la asignación per cápita calculada
+          para el concepto consultado, considerando aquellos municipios cuyo índice de Necesidades Básicas Insatisfechas (NBI)
+          se encuentre dentro de un rango del 10% por encima y del 10% por debajo del NBI del municipio consultado. Por ejemplo,
+          si se consulta la participación de Propósito General para el municipio de Abejorral (Antioquia), cuyo NBI certificado
+          para la vigencia 2026 es del 14%, este indicador mostrará el promedio per cápita de los recursos asignados por dicho
+          concepto a los municipios con niveles de NBI comprendidos entre el 12,6% y el 15,4%.</li>
+        <li>La información relacionada con el promedio por población y NBI corresponde al promedio de la asignación per cápita
+          calculada para el concepto consultado, considerando aquellos municipios que cumplen simultáneamente dos condiciones,
+          i) que su población se encuentre dentro de un rango del 10% por encima y del 10% por debajo de la población del
+          municipio consultado y ii) que su índice de Necesidades Básicas Insatisfechas (NBI) se encuentre dentro de un rango
+          del 10% por encima y del 10% por debajo del NBI del municipio consultado.</li>
+        <li>La información relacionada con la brecha corresponde a la diferencia entre la asignación per cápita del municipio
+          consultado y el promedio per cápita de referencia correspondiente (departamental, población, NBI). Un valor positivo
+          indica que la asignación per cápita del municipio es superior al promedio de referencia, mientras que un valor
+          negativo indica que es inferior.</li>
+        <li>Para cada asignación se presentan las variables más representativas y con mayor incidencia en la distribución de
+          los recursos. Sin perjuicio de lo anterior, debe tenerse en cuenta que la asignación final resulta de la aplicación
+          integral de la metodología definida en la ley y depende del comportamiento de todas las variables utilizadas en la
+          distribución a nivel nacional. En particular, algunas variables, como los indicadores de eficiencia, se determinan con
+          base en el desempeño relativo de cada entidad territorial frente al total nacional.</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================
+       Plantillas reutilizables de las secciones por concepto
+       =================================================================== -->
+
+  <!-- Gráfica de criterios, columnas apiladas vigencia anterior y actual -->
+  <ng-template #tplCriterios let-criterios="criterios" let-titulo="titulo">
+    <div class="grafica-criterios">
+      <div class="g-titulo">{{ titulo }}</div>
+      <div class="columnas">
+        <div class="col" *ngFor="let b of barrasCriterios(criterios)">
+          <div class="pila">
+            <ng-container *ngIf="!b.sinRecursos; else sinValor">
+              <div class="seg actual" *ngIf="b.actual > 0" [style.height.%]="b.altoActual"><span>{{ formatPesos(b.actual) }}</span></div>
+              <div class="seg anterior" *ngIf="b.anterior > 0" [style.height.%]="b.altoAnterior"><span>{{ formatPesos(b.anterior) }}</span></div>
+            </ng-container>
+            <ng-template #sinValor><span class="cero">$0</span></ng-template>
+          </div>
+          <div class="col-etiqueta">{{ b.criterio }}</div>
+        </div>
+      </div>
+      <div class="leyenda" *ngIf="datosGenerales as dg">
+        <span><i class="cuadro anterior"></i>{{ dg.anioAnterior }}</span>
+        <span><i class="cuadro actual"></i>{{ dg.anioActual }}</span>
+        <span class="unidad">millones de pesos</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Dos columnas, vigencia anterior y actual, para criterios de un solo valor -->
+  <ng-template #tplAnios let-criterio="criterio" let-titulo="titulo">
+    <div class="grafica-anios">
+      <div class="g-titulo">{{ titulo }}</div>
+      <div class="columnas">
+        <div class="col" *ngFor="let b of barrasAnios(criterio)">
+          <div class="pila">
+            <span class="valor">{{ formatPesos(b.valor) }}</span>
+            <div class="barra" [class.actual]="b.actual" [style.height.%]="b.alto"></div>
+          </div>
+          <div class="col-etiqueta">{{ b.anio }}</div>
+        </div>
+      </div>
+      <div class="leyenda"><span class="unidad">millones de pesos</span></div>
+    </div>
+  </ng-template>
+
+  <!-- Per cápita del municipio frente a los promedios, con las brechas -->
+  <ng-template #tplPerCapita let-comp="comp">
+    <div class="grafica-percapita" *ngIf="comp">
+      <div class="g-titulo">Recursos del SGP per cápita {{ datosGenerales?.anioActual }} (pesos)</div>
+      <div class="columnas">
+        <div class="col" *ngFor="let b of barrasPerCapita(comp)">
+          <div class="pila">
+            <span class="valor">{{ formatPesos(b.valor) }}</span>
+            <div class="barra" [class.municipio]="b.esMunicipio" [style.height.%]="b.alto"></div>
+          </div>
+          <div class="col-etiqueta">{{ b.etiqueta }}</div>
+        </div>
+      </div>
+
+      <p class="brecha-titulo">Brecha del municipio frente al promedio</p>
+      <div class="brechas">
+        <div class="brecha" *ngFor="let br of brechas(comp)" [ngClass]="claseVariacion(br.brecha)">
+          <small>{{ br.titulo }}</small>
+          <b>{{ formatPorcentaje(br.brecha) }}</b>
+          <span>{{ formatPesos(br.diferencia) }} por habitante</span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Cargando -->
+  <div *ngIf="isLoading || exportando" class="loading-overlay">
+    <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
+    <p>{{ exportando ? 'Procesando la ficha, por favor espere...' : 'Cargando datos...' }}</p>
+  </div>
+
+</div>

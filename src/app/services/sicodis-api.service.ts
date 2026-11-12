@@ -442,6 +442,93 @@ export interface FichaComparativaEntidad {
   tipo: number;
 }
 
+
+// ========== Ficha Municipal SGP (sgp/ficha/{codigoDane}) ==========
+// Valores en pesos llegan en millones; per cápita y promedios en pesos;
+// variaciones y brechas como fracción (0.0622 = 6,22%)
+
+export interface FichaSgpDatosGenerales {
+  codigoDane: string;
+  nombreMunicipio: string;
+  codigoDepto: string;
+  nombreDepto: string;
+  anioAnterior: number;
+  anioActual: number;
+  poblacionAnterior: number;
+  poblacionActual: number;
+  variacionPoblacion: number | null;
+  nbiAnterior: number | null;
+  nbiActual: number | null;
+  categoria: string | null;
+}
+
+export interface FichaSgpRecurso {
+  idConcepto: number | null;
+  codigo: string;
+  concepto: string;
+  colorHex: string | null;
+  orden: number;
+  valorAnterior: number;
+  valorActual: number;
+  diferencia: number;
+  variacion: number | null;
+}
+
+export interface FichaSgpComparativo {
+  idConcepto: number;
+  codigo: string;
+  concepto: string;
+  orden: number;
+  rango: number;
+  perCapitaMunicipio: number | null;
+  promedioDepartamental: number | null;
+  promedioPoblacion: number | null;
+  promedioNBI: number | null;
+  promedioPoblacionNBI: number | null;
+  brechaDepartamental: number | null;
+  brechaPoblacion: number | null;
+  brechaNBI: number | null;
+  brechaPoblacionNBI: number | null;
+  diferenciaDepartamental: number | null;
+  diferenciaPoblacion: number | null;
+  diferenciaNBI: number | null;
+  diferenciaPoblacionNBI: number | null;
+}
+
+export interface FichaSgpCriterio {
+  orden: number;
+  criterio: string;
+  valorAnterior: number;
+  valorActual: number;
+  diferencia: number;
+  variacion: number | null;
+}
+
+export interface FichaSgpConcepto<TCriterios = FichaSgpCriterio[], TIndicadores = Record<string, any>> {
+  comparativo: FichaSgpComparativo | null;
+  criterios: TCriterios;
+  indicadores: TIndicadores | null;
+}
+
+export interface FichaSgpCriteriosSalud {
+  regimenSubsidiado: FichaSgpCriterio[];
+  saludPublica: FichaSgpCriterio[];
+  subsidioOferta: FichaSgpCriterio[];
+}
+
+export interface FichaSgp {
+  datosGenerales: FichaSgpDatosGenerales | null;
+  recursos: FichaSgpRecurso[];
+  educacion: FichaSgpConcepto;
+  salud: FichaSgpConcepto<FichaSgpCriteriosSalud>;
+  agua: FichaSgpConcepto;
+  proposito: FichaSgpConcepto;
+  alimentacion: FichaSgpConcepto;
+  riberenos: FichaSgpConcepto;
+  resguardos: FichaSgpConcepto;
+  fonpet: { comparativo: FichaSgpComparativo | null };
+}
+
 // ========== PGN Request Parameters Interfaces ==========
 export interface VigenciaPgn {
   id_vigencia: string;
@@ -1927,6 +2014,16 @@ getSgrDescargaResumenPbcRecaudoMensual( idvigencia: number
   getSgpDescargarFichaComparativaEntidad(idVigencia: number, codigoDepto1: string, codigoEntidad1: string, codigoDepto2: string, codigoEntidad2: string, depto1: string, entidad1: string, depto2: string, entidad2: string): Observable<Blob> {
     const url = `${this.baseUrl}/sgp/archivo_ficha_comparativa_entidad/${idVigencia}/${codigoDepto1}/${codigoEntidad1}/${codigoDepto2}/${codigoEntidad2}/${depto1}/${entidad1}/${depto2}/${entidad2}`;
     return this.http.get(url, { responseType: 'blob' });  // responseType 'blob' indica que será un archivo binario
+  }
+
+  /**
+   * Obtiene la ficha municipal del SGP (vigencia actual frente a la anterior)
+   * @param codigoDane - Código DANE del municipio (5 dígitos)
+   * @returns Observable con la ficha completa agrupada por concepto
+   */
+  getSgpFichaMunicipio(codigoDane: string): Observable<FichaSgp> {
+    const url = `${this.baseUrl}/sgp/ficha/${codigoDane}`;
+    return this.http.get<FichaSgp>(url);
   }
 
 // ========== PGN Methods ==========  
