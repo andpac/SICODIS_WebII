@@ -288,6 +288,7 @@ export class SgpFichaComponent implements OnInit {
     esTotal: boolean;
   }[] {
     return (this.ficha?.recursos ?? [])
+      .filter(r => r.codigo === 'TOTAL' || this.tieneAsignacion(r.codigo))
       .slice()
       .sort((x, y) => x.orden - y.orden)
       .map(r => {
@@ -472,6 +473,15 @@ export class SgpFichaComponent implements OnInit {
   /** Fila de recursos de un concepto (valores de las dos vigencias y su variación) */
   recurso(codigo: string): FichaSgpRecurso | null {
     return this.ficha?.recursos?.find(r => r.codigo === codigo) ?? null;
+  }
+
+  /**
+   * Indica si el municipio recibe recursos del concepto en alguna de las dos vigencias.
+   * Si no recibe nada en ninguna (por ejemplo Ribereños o Resguardos), la sección y su fila no se muestran
+   */
+  tieneAsignacion(codigo: string): boolean {
+    const r = this.recurso(codigo);
+    return !!r && ((r.valorAnterior ?? 0) > 0 || (r.valorActual ?? 0) > 0);
   }
 
   /** Texto de variación del total de un concepto, con el mismo formato que la de un criterio */

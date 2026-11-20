@@ -519,6 +519,7 @@ export interface FichaSgpCriteriosSalud {
 export interface FichaSgp {
   datosGenerales: FichaSgpDatosGenerales | null;
   recursos: FichaSgpRecurso[];
+  comparativoTotal: FichaSgpComparativo | null;
   educacion: FichaSgpConcepto;
   salud: FichaSgpConcepto<FichaSgpCriteriosSalud>;
   agua: FichaSgpConcepto;

@@ -844,6 +844,25 @@
   }
 }
 
+/* Per cápita del Total SGP debajo de la gráfica de variación, mismo ancho y centrado */
+/* Variación y per cápita del Total lado a lado; se apilan en pantallas angostas */
+.datos-generales-fila {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  align-items: start;
+
+  .grafica-variacion,
+  .percapita-total {
+    max-width: none;
+    margin: 0;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ===================================================================
    SECCIONES POR CONCEPTO (Educación, Salud, Agua, ...)
    Cada concepto define sus colores con variables y las plantillas los usan

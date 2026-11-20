@@ -317,8 +317,14 @@ function indicadores(ctx: FichaPdfContexto): any {
 
 function seccionVariacion(ctx: FichaPdfContexto): any {
   const dg = ctx.ficha!.datosGenerales!;
-  const anchoBarra = 210;
-  const recursos = (ctx.ficha!.recursos ?? []).slice().sort((a, b) => a.orden - b.orden);
+  // Con el per cápita del Total al lado, la tabla de variación ocupa media página
+  const hayTotal = !!ctx.ficha!.comparativoTotal;
+  const anchoBarra = hayTotal ? 50 : 210;
+  const fs = hayTotal ? 7 : 8.5;
+  const recursos = (ctx.ficha!.recursos ?? [])
+    .filter(r => r.codigo === 'TOTAL' || tieneAsignacion(ctx, r.codigo))
+    .slice()
+    .sort((a, b) => a.orden - b.orden);
 
   const filas = recursos.map(r => {
     const anterior = r.valorAnterior ?? 0;
@@ -334,28 +340,30 @@ function seccionVariacion(ctx: FichaPdfContexto): any {
         }
       : { text: '' };
     return [
-      { text: NOMBRES_CORTOS[r.codigo] ?? r.concepto, bold: esTotal, alignment: 'right', style: 'celda' },
-      { text: `$${ctx.formatNumero(anterior)}`, alignment: 'right', bold: esTotal, style: 'celda' },
-      { text: `$${ctx.formatNumero(actual)}`, alignment: 'right', bold: esTotal, style: 'celda' },
+      { text: NOMBRES_CORTOS[r.codigo] ?? r.concepto, bold: esTotal, alignment: 'right', style: 'celda', fontSize: fs },
+      { text: `$${ctx.formatNumero(anterior)}`, alignment: 'right', bold: esTotal, style: 'celda', fontSize: fs },
+      { text: `$${ctx.formatNumero(actual)}`, alignment: 'right', bold: esTotal, style: 'celda', fontSize: fs },
       barra,
-      { text: r.variacion === null ? 'No aplica' : ctx.formatPorcentaje(r.variacion), alignment: 'right', bold: true, color: colorVariacion(r.variacion), style: 'celda' }
+      { text: r.variacion === null ? 'No aplica' : ctx.formatPorcentaje(r.variacion), alignment: 'right', bold: true, color: colorVariacion(r.variacion), style: 'celda', fontSize: fs }
     ];
   });
 
-  return [
-    tituloSeccion('Datos generales sobre la asignación', AZUL),
+  const encabezado = (texto: string) => ({ text: texto, style: 'encabezadoTabla', fontSize: hayTotal ? 7 : 8.5 });
+
+  const variacion = [
+    { text: 'Variación del SGP (millones de pesos)', style: 'subtitulo', margin: [0, 0, 0, 4] },
     {
-      margin: [0, 4, 0, 4],
+      margin: [0, 0, 0, 4],
       table: {
         headerRows: 1,
-        widths: [70, 62, 62, anchoBarra, '*'],
+        widths: hayTotal ? [50, 36, 36, anchoBarra, 38] : [70, 62, 62, anchoBarra, '*'],
         body: [
           [
-            { text: 'Concepto', style: 'encabezadoTabla' },
-            { text: `${dg.anioAnterior}`, style: 'encabezadoTabla' },
-            { text: `${dg.anioActual}`, style: 'encabezadoTabla' },
-            { text: `Proporción ${dg.anioAnterior} / ${dg.anioActual}`, style: 'encabezadoTabla' },
-            { text: 'Variación', style: 'encabezadoTabla' }
+            encabezado('Concepto'),
+            encabezado(`${dg.anioAnterior}`),
+            encabezado(`${dg.anioActual}`),
+            encabezado(hayTotal ? 'Proporción' : `Proporción ${dg.anioAnterior} / ${dg.anioActual}`),
+            encabezado('Variación')
           ],
           ...filas
         ]
@@ -364,6 +372,23 @@ function seccionVariacion(ctx: FichaPdfContexto): any {
     },
     leyenda(dg.anioAnterior, dg.anioActual, '#dae3f3', '#8faadc'),
     { text: 'Hasta la fecha no se ha distribuido la totalidad de los recursos de educación y del FONPET.', style: 'nota', margin: [0, 4, 0, 12] }
+  ];
+
+  if (!hayTotal) {
+    return [tituloSeccion('Datos generales sobre la asignación', AZUL), ...variacion];
+  }
+
+  // Variación y per cápita del Total en una sola línea, igual que en pantalla
+  return [
+    tituloSeccion('Datos generales sobre la asignación', AZUL),
+    {
+      unbreakable: true,
+      columnGap: 15,
+      columns: [
+        { width: 250, stack: variacion },
+        { width: 250, stack: [perCapita(ctx, ctx.ficha!.comparativoTotal!, { clave: 'total', codigo: 'TOTAL', titulo: 'Total SGP', actual: '#7f7f7f', anterior: '#dae3f3', banda: AZUL }, true)] }
+      ]
+    }
   ];
 }
 
@@ -374,7 +399,8 @@ function seccionVariacion(ctx: FichaPdfContexto): any {
 function seccionConcepto(ctx: FichaPdfContexto, c: typeof CONCEPTOS[number]): any {
   const ficha: any = ctx.ficha;
   const datos = ficha?.[c.clave];
-  if (!datos) return null;
+  // Si el municipio no recibe recursos del concepto en ninguna vigencia, la sección no sale
+  if (!datos || !tieneAsignacion(ctx, c.codigo)) return null;
   const dg = ctx.ficha!.datosGenerales!;
 
   // Criterios a mostrar. Salud trae tres grupos; las asignaciones de un solo valor usan su fila de recursos
@@ -467,7 +493,7 @@ function tablaCriterios(ctx: FichaPdfContexto, grupos: { titulo?: string; criter
 }
 
 /** Per cápita del municipio frente a los promedios y las cuatro brechas */
-function perCapita(ctx: FichaPdfContexto, comp: FichaSgpComparativo, c: typeof CONCEPTOS[number]): any {
+function perCapita(ctx: FichaPdfContexto, comp: FichaSgpComparativo, c: typeof CONCEPTOS[number], compacto = false): any {
   const dg = ctx.ficha!.datosGenerales!;
   const columnas = [
     { etiqueta: 'Municipio', valor: comp.perCapitaMunicipio ?? 0, municipio: true },
@@ -477,12 +503,14 @@ function perCapita(ctx: FichaPdfContexto, comp: FichaSgpComparativo, c: typeof C
     { etiqueta: 'Promedio población y NBI', valor: comp.promedioPoblacionNBI ?? 0, municipio: false }
   ];
   const maximo = Math.max(1, ...columnas.map(x => x.valor));
-  const anchoMax = 260;
+  // En modo compacto la gráfica cabe en media página, al lado de la variación
+  const anchoMax = compacto ? 90 : 260;
+  const fs = compacto ? 7 : 8.5;
 
   const barras = columnas.map(x => ([
-    { text: x.etiqueta, style: 'celda', bold: x.municipio },
+    { text: x.etiqueta, style: 'celda', bold: x.municipio, fontSize: fs },
     { canvas: [{ type: 'rect', x: 0, y: 1, w: Math.max(1, (x.valor / maximo) * anchoMax), h: 10, color: x.municipio ? c.actual : '#bfbfbf' }] },
-    { text: ctx.formatPesos(x.valor), alignment: 'right', style: 'celda', bold: x.municipio }
+    { text: ctx.formatPesos(x.valor), alignment: 'right', style: 'celda', bold: x.municipio, fontSize: fs }
   ]));
 
   const brechas = [
@@ -497,17 +525,17 @@ function perCapita(ctx: FichaPdfContexto, comp: FichaSgpComparativo, c: typeof C
     margin: [0, 0, 0, 8],
     stack: [
       { text: `Recursos del SGP per cápita ${dg.anioActual} (pesos)`, style: 'subtitulo', margin: [0, 0, 0, 4] },
-      { table: { widths: [120, anchoMax + 6, '*'], body: barras }, layout: 'noBorders' },
+      { table: { widths: [compacto ? 78 : 120, anchoMax + 6, '*'], body: barras }, layout: 'noBorders' },
       { text: 'Brecha del municipio frente al promedio', bold: true, fontSize: 8.5, alignment: 'center', margin: [0, 6, 0, 3] },
       {
         table: {
           widths: ['*', '*', '*', '*'],
           body: [
-            brechas.map(x => ({ text: x.t, style: 'encabezadoTabla' })),
+            brechas.map(x => ({ text: x.t, style: 'encabezadoTabla', fontSize: compacto ? 7 : 8.5 })),
             brechas.map(x => ({
               stack: [
-                { text: x.b === null ? 'No aplica' : ctx.formatPorcentaje(x.b), fontSize: 13, alignment: 'center', color: '#1f2937' },
-                { text: `${ctx.formatPesos(x.d)} por habitante`, fontSize: 7, alignment: 'center', color: colorVariacion(x.b) }
+                { text: x.b === null ? 'No aplica' : ctx.formatPorcentaje(x.b), fontSize: compacto ? 11 : 13, alignment: 'center', color: '#1f2937' },
+                { text: `${ctx.formatPesos(x.d)} por habitante`, fontSize: compacto ? 6 : 7, alignment: 'center', color: colorVariacion(x.b) }
               ],
               margin: [0, 2, 0, 2]
             }))
@@ -725,6 +753,12 @@ function tablaLigera(): any {
     paddingTop: () => 3,
     paddingBottom: () => 3
   };
+}
+
+/** El municipio recibe recursos del concepto en alguna de las dos vigencias */
+function tieneAsignacion(ctx: FichaPdfContexto, codigo: string): boolean {
+  const r = ctx.recurso(codigo);
+  return !!r && ((r.valorAnterior ?? 0) > 0 || (r.valorActual ?? 0) > 0);
 }
 
 function colorVariacion(valor: number | null | undefined): string {

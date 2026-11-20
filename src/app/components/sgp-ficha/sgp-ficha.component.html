@@ -193,43 +193,51 @@
         </mat-card-header>
 
         <mat-card-content *ngIf="seccionesAbiertas['datosGenerales']">
-          <div class="grafica-variacion">
-            <div class="grafica-titulo">Variación del SGP (millones de pesos)</div>
+          <!-- Variación y per cápita del Total en una sola línea -->
+          <div class="datos-generales-fila">
+            <div class="grafica-variacion">
+              <div class="grafica-titulo">Variación del SGP (millones de pesos)</div>
 
-            <div class="fila" *ngFor="let f of filasVariacion" [class.total]="f.esTotal">
-              <div class="etiqueta">{{ f.etiqueta }}</div>
+              <div class="fila" *ngFor="let f of filasVariacion" [class.total]="f.esTotal">
+                <div class="etiqueta">{{ f.etiqueta }}</div>
 
-              <div class="barra" *ngIf="!f.sinRecursos">
-                <div class="segmento anterior" [style.width.%]="f.anchoAnterior" [class.angosto]="f.anchoAnterior < 8">
-                  <span>${{ formatNumero(f.anterior) }}</span>
+                <div class="barra" *ngIf="!f.sinRecursos">
+                  <div class="segmento anterior" [style.width.%]="f.anchoAnterior" [class.angosto]="f.anchoAnterior < 8">
+                    <span>${{ formatNumero(f.anterior) }}</span>
+                  </div>
+                  <div class="segmento actual" [style.width.%]="f.anchoActual" [class.angosto]="f.anchoActual < 8">
+                    <span>${{ formatNumero(f.actual) }}</span>
+                  </div>
                 </div>
-                <div class="segmento actual" [style.width.%]="f.anchoActual" [class.angosto]="f.anchoActual < 8">
-                  <span>${{ formatNumero(f.actual) }}</span>
+                <div class="barra vacia" *ngIf="f.sinRecursos"><span>$0</span></div>
+
+                <div class="var" [ngClass]="claseVariacion(f.variacion)">
+                  <ng-container *ngIf="f.variacion !== null">
+                    <mat-icon>{{ iconoVariacion(f.variacion) }}</mat-icon>
+                    <span>{{ formatPorcentaje(f.variacion) }}</span>
+                  </ng-container>
                 </div>
               </div>
-              <div class="barra vacia" *ngIf="f.sinRecursos"><span>$0</span></div>
 
-              <div class="var" [ngClass]="claseVariacion(f.variacion)">
-                <ng-container *ngIf="f.variacion !== null">
-                  <mat-icon>{{ iconoVariacion(f.variacion) }}</mat-icon>
-                  <span>{{ formatPorcentaje(f.variacion) }}</span>
-                </ng-container>
+              <div class="leyenda">
+                <span><i class="cuadro anterior"></i>{{ dg.anioAnterior }}</span>
+                <span><i class="cuadro actual"></i>{{ dg.anioActual }}</span>
               </div>
+
+              <p class="nota">Hasta la fecha no se ha distribuido la totalidad de los recursos de educación y del FONPET</p>
             </div>
 
-            <div class="leyenda">
-              <span><i class="cuadro anterior"></i>{{ dg.anioAnterior }}</span>
-              <span><i class="cuadro actual"></i>{{ dg.anioActual }}</span>
+            <!-- Per cápita del Total SGP frente a los promedios -->
+            <div class="ficha-concepto percapita-total" *ngIf="ficha.comparativoTotal as compTotal">
+              <ng-container *ngTemplateOutlet="tplPerCapita; context: { comp: compTotal }"></ng-container>
             </div>
-
-            <p class="nota">Hasta la fecha no se ha distribuido la totalidad de los recursos de educación y del FONPET</p>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
 
     <!-- SECCIÓN 3 Educación -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-educacion" *ngIf="ficha.educacion as edu">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-educacion" *ngIf="tieneAsignacion('EDUCACION') && ficha.educacion as edu">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -335,7 +343,7 @@
 
 
     <!-- SECCIÓN 4 Salud -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-salud" *ngIf="ficha.salud as sal">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-salud" *ngIf="tieneAsignacion('SALUD') && ficha.salud as sal">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -470,7 +478,7 @@
 
 
     <!-- SECCIÓN 5 Agua Potable y Saneamiento Básico -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-agua" *ngIf="ficha.agua as agu">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-agua" *ngIf="tieneAsignacion('AGUA') && ficha.agua as agu">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -534,7 +542,7 @@
 
 
     <!-- SECCIÓN 6 Propósito General -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-proposito" *ngIf="ficha.proposito as pg">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-proposito" *ngIf="tieneAsignacion('PROPOSITO') && ficha.proposito as pg">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -583,7 +591,7 @@
     </div>
 
     <!-- SECCIÓN 7 Alimentación Escolar -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-alimentacion" *ngIf="ficha.alimentacion as pae">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-alimentacion" *ngIf="tieneAsignacion('ALIMENTACION') && ficha.alimentacion as pae">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -631,7 +639,7 @@
     </div>
 
     <!-- SECCIÓN 8 Ribereños del río Magdalena -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-riberenos" *ngIf="ficha.riberenos as rib">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-riberenos" *ngIf="tieneAsignacion('RIBERENOS') && ficha.riberenos as rib">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -677,7 +685,7 @@
     </div>
 
     <!-- SECCIÓN 9 Resguardos Indígenas -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-resguardos" *ngIf="ficha.resguardos as res">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-resguardos" *ngIf="tieneAsignacion('RESGUARDOS') && ficha.resguardos as res">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
@@ -726,7 +734,7 @@
     </div>
 
     <!-- SECCIÓN 10 FONPET -->
-    <div class="efficiency-card ficha-seccion ficha-concepto concepto-fonpet" *ngIf="ficha.fonpet as fon">
+    <div class="efficiency-card ficha-seccion ficha-concepto concepto-fonpet" *ngIf="tieneAsignacion('FONPET') && ficha.fonpet as fon">
       <mat-card>
         <mat-card-header>
           <div class="card-header-content">
